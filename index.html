@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>⚽ Ball-Knowledge</title>
+<title>⚽ Ball-Knowledge – Fußball-Quiz & Ratespiele</title>
 <meta name="description" content="Fußball-Ratespiele: Höher oder Niedriger, Fußball Tic-Tac-Toe und Karriere-Raten. Wie gut ist dein Fußballwissen?">
 <meta name="theme-color" content="#0b141f">
 <!-- Favicon: Sticker-Logo (Variante B) als eingebettetes SVG (keine extra Datei nötig) -->
@@ -554,7 +554,31 @@
     display: none;
   }
   .card.wrong .photo { outline-color: var(--red); }
-  .card .emoji { font-size: 3rem; }
+  .photo.fotoEin { animation: fotoEin 0.35s ease; }
+  @keyframes fotoEin {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  /* Platzhalter, solange das Foto lädt: exakt dieselbe Fläche wie das Foto,
+     sonst springt die Karte (und alles darunter), sobald das Foto da ist. */
+  .card .emoji {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin: 0 auto;
+    border: 4px solid var(--surface);
+    outline: 3px solid var(--green);
+    background: var(--bg);
+    font-size: 3rem;
+    line-height: 142px;
+    text-align: center;
+    animation: platzhalterPuls 1.4s ease-in-out infinite;
+  }
+  .card.wrong .emoji { outline-color: var(--red); }
+  @keyframes platzhalterPuls {
+    0%, 100% { opacity: 0.5; }
+    50%      { opacity: 1; }
+  }
   .card .name {
     font-family: var(--font-head);
     font-weight: 700;
@@ -1163,6 +1187,7 @@
     #cards { gap: 8px; }
     .card { padding: 18px 10px 16px; min-height: unset; }
     .card .photo { width: 100px; height: 100px; }
+    .card .emoji { width: 100px; height: 100px; line-height: 92px; font-size: 2rem; }
     .card .name { font-size: 1.1rem; }
     .card .value { font-size: 2rem; min-height: 2rem; }
     #vs span { width: 36px; height: 36px; font-size: 0.9rem; }
@@ -2318,6 +2343,10 @@ async function zeigeFoto(spieler, imgEl, emojiEl) {
       if (imgEl.dataset.spieler !== erwartet) return;
       imgEl.style.display = "block";
       emojiEl.style.display = "none";
+      // Foto sanft einblenden (Klasse neu setzen, damit die Animation neu startet)
+      imgEl.classList.remove("fotoEin");
+      void imgEl.offsetWidth;
+      imgEl.classList.add("fotoEin");
     };
     imgEl.src = url;
   }
