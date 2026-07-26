@@ -1844,7 +1844,7 @@
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script src="spieler.js?v=5"></script>
-<script src="spieler-bundesliga.js?v=5"></script>
+<script src="spieler-bundesliga.js?v=6"></script>
 <script>
 // Normalisiert Namen für die Suche: Akzente/Sonderzeichen -> einfache Buchstaben,
 // damit man z. B. "kante" -> "Kanté", "gundogan" -> "Gündoğan",
@@ -1873,7 +1873,7 @@ function normText(str) {
 // ---------- Ligen aus den Vereinsstationen ableiten ----------
 // Nur Vereine, bei denen unsere Spieler wirklich in der 1. Liga gespielt haben
 const LIGA_KLUBS = {
-  "Bundesliga": ["FC Bayern","Borussia Dortmund","RB Leipzig","Bayer Leverkusen","VfB Stuttgart","Werder Bremen","Borussia Mönchengladbach","Eintracht Frankfurt","VfL Wolfsburg","SC Freiburg","TSG Hoffenheim","FC Augsburg","1. FC Köln","Union Berlin","Heidenheim","Hannover 96","Hamburger SV","Schalke 04","1. FC Nürnberg","Bochum","FC Ingolstadt","Hertha BSC","Kaiserslautern","Mainz 05","Arminia Bielefeld","Greuther Fürth","Darmstadt 98","St. Pauli","Holstein Kiel"],
+  "Bundesliga": ["FC Bayern","Borussia Dortmund","RB Leipzig","Bayer Leverkusen","VfB Stuttgart","Werder Bremen","Borussia Mönchengladbach","Eintracht Frankfurt","VfL Wolfsburg","SC Freiburg","TSG Hoffenheim","FC Augsburg","1. FC Köln","Union Berlin","Heidenheim","Hannover 96","Hamburger SV","Schalke 04","1. FC Nürnberg","Bochum","FC Ingolstadt","Hertha BSC","Kaiserslautern","Mainz 05","Arminia Bielefeld","Greuther Fürth","Darmstadt 98","St. Pauli","Holstein Kiel","1860 München","Energie Cottbus","Hansa Rostock","MSV Duisburg","Karlsruher SC","Alemannia Aachen","Fortuna Düsseldorf","Paderborn","Eintracht Braunschweig","Unterhaching"],
   "Premier League": ["Man City","Man United","Liverpool","Arsenal","Chelsea","Tottenham","Newcastle","Aston Villa","West Ham","Everton","Brighton","Crystal Palace","Bournemouth","Brentford","Leicester","Southampton","Burnley","Fulham","Stoke","Sunderland","Leeds","Watford"],
   "La Liga": ["Real Madrid","FC Barcelona","Atlético Madrid","Sevilla","Real Sociedad","Athletic Bilbao","Villarreal","Celta Vigo","Espanyol","Mallorca","Getafe","Las Palmas","Valencia","Betis"],
   "Serie A": ["Juventus","AC Milan","Inter Mailand","Napoli","AS Rom","Lazio","Atalanta","Fiorentina","Cagliari","Torino","Bologna","Udinese","Sampdoria","Brescia","Palermo","Como"],
@@ -1981,7 +1981,7 @@ const VEREINSFARBEN = {
   "Racing Straßburg": ["#009fe3","#ffffff"], "Sporting Braga": ["#d20a11","#ffffff"],
   "West Bromwich Albion": ["#122f67","#ffffff"], "Karlsruher SC": ["#004b95","#ffffff"],
   "Flamengo": ["#e30613","#000000"], "Birmingham": ["#223b8f","#ffffff"],
-  "Sheffield United": ["#ee2737","#ffffff"], "SC Paderborn 07": ["#005ca9","#000000"],
+  "Sheffield United": ["#ee2737","#ffffff"], "Paderborn": ["#005ca9","#000000"],
   "Blackburn Rovers": ["#009ee0","#ffffff"], "Queens Park Rangers": ["#005cab","#ffffff"],
   "FC Zürich": ["#ffffff","#0a3a7d"], "Sporting Gijón": ["#e30613","#ffffff"],
   "Rayo Vallecano": ["#ffffff","#e30613"], "FC Lorient": ["#f36f21","#000000"],
@@ -1989,7 +1989,7 @@ const VEREINSFARBEN = {
   "FC Twente Enschede": ["#d3103c","#ffffff"], "Grêmio": ["#0d80bf","#000000"],
   "Hansa Rostock": ["#005ca9","#ffffff"], "Real Saragossa": ["#ffffff","#003da5"],
   "Schachtar Donezk": ["#f36f21","#000000"], "U.S. Lecce": ["#ffd800","#da291c"],
-  "TSV 1860 München": ["#6ab2e2","#ffffff"], "Delfino Pescara 1936": ["#ffffff","#0090d4"],
+  "1860 München": ["#6ab2e2","#ffffff"], "Delfino Pescara 1936": ["#ffffff","#0090d4"],
   "FC Málaga": ["#2e9bd6","#ffffff"], "FC Cádiz": ["#ffe500","#004a98"],
   "Royal Antwerpen": ["#d6001c","#ffffff"], "Eintracht Braunschweig": ["#ffd500","#003f8a"],
   "BSC Young Boys": ["#ffd800","#000000"], "SCO Angers": ["#000000","#ffffff"],
@@ -2008,7 +2008,9 @@ const VEREINSFARBEN = {
   "FC Portsmouth": ["#001489","#ffffff"], "AC Perugia Calcio": ["#ba0716","#ffffff"],
   "FC Sochaux": ["#ffd500","#00387b"], "SD Huesca": ["#0d2f6d","#96172e"],
   "U.S. Salernitana 1919": ["#952128","#ffffff"], "FC Elche": ["#ffffff","#008542"],
-  "Charlton Athletic": ["#d4021d","#ffffff"], "SpVgg Unterhaching": ["#e30613","#004f9f"],
+  "Charlton Athletic": ["#d4021d","#ffffff"], "Unterhaching": ["#e30613","#004f9f"],
+  "Energie Cottbus": ["#e30613","#ffffff"], "MSV Duisburg": ["#004f9f","#ffffff"],
+  "Alemannia Aachen": ["#ffd500","#000000"],
   "Palmeiras São Paulo": ["#006437","#ffffff"], "FC Millwall": ["#001d5e","#ffffff"],
   "Willem II Tilburg": ["#d6001c","#0033a0"], "ES Troyes AC": ["#004170","#ffffff"],
   "SK Rapid Wien": ["#008542","#ffffff"], "Corinthians São Paulo": ["#ffffff","#000000"],
@@ -2113,12 +2115,12 @@ const VEREINS_KUERZEL = {
   "Wigan Athletic": "WIG", "FC Reading": "REA", "Levante UD": "LEV",
   "AS Saint-Étienne": "ASSE", "Racing Straßburg": "RCS", "Sporting Braga": "SCB",
   "West Bromwich Albion": "WBA", "Karlsruher SC": "KSC", "Flamengo": "FLA",
-  "Birmingham": "BIR", "Sheffield United": "SHU", "SC Paderborn 07": "PAD",
+  "Birmingham": "BIR", "Sheffield United": "SHU", "Paderborn": "PAD",
   "Blackburn Rovers": "BLB", "Queens Park Rangers": "QPR", "FC Zürich": "FCZ",
   "Sporting Gijón": "GIJ", "Rayo Vallecano": "RAY", "FC Lorient": "LOR",
   "Spezia Calcio": "SPE", "Swansea City": "SWA", "FC Twente Enschede": "TWE",
   "Grêmio": "GRE", "Hansa Rostock": "HRO", "Real Saragossa": "ZAR",
-  "Schachtar Donezk": "SHA", "U.S. Lecce": "LEC", "TSV 1860 München": "M60",
+  "Schachtar Donezk": "SHA", "U.S. Lecce": "LEC", "1860 München": "M60",
   "Delfino Pescara 1936": "PES", "FC Málaga": "MAL", "FC Cádiz": "CAD",
   "Royal Antwerpen": "ANT", "Eintracht Braunschweig": "BTSV",
   "BSC Young Boys": "YB", "SCO Angers": "SCO", "Chievo Verona": "CHV",
@@ -2133,7 +2135,8 @@ const VEREINS_KUERZEL = {
   "FK Roter Stern Belgrad": "CZV", "Derby County": "DER",
   "FC Portsmouth": "POM", "AC Perugia Calcio": "PER", "FC Sochaux": "FCSM",
   "SD Huesca": "HUE", "U.S. Salernitana 1919": "SLN", "FC Elche": "ELC",
-  "Charlton Athletic": "CHA", "SpVgg Unterhaching": "UNT",
+  "Charlton Athletic": "CHA", "Unterhaching": "UNT",
+  "Energie Cottbus": "FCE", "MSV Duisburg": "MSV", "Alemannia Aachen": "AAC",
   "Palmeiras São Paulo": "PLM", "FC Millwall": "MLW",
   "Willem II Tilburg": "WIL", "ES Troyes AC": "TRO", "SK Rapid Wien": "RAP",
   "Corinthians São Paulo": "COR", "Cruzeiro Belo Horizonte": "CRZ",
@@ -2155,6 +2158,9 @@ const VEREINS_VOLLNAME = {
   "FC Ingolstadt": "FC Ingolstadt 04", "Kaiserslautern": "1. FC Kaiserslautern",
   "Mainz 05": "1. FSV Mainz 05", "Greuther Fürth": "SpVgg Greuther Fürth",
   "Darmstadt 98": "SV Darmstadt 98", "St. Pauli": "FC St. Pauli",
+  "1860 München": "TSV 1860 München", "Paderborn": "SC Paderborn 07",
+  "Unterhaching": "SpVgg Unterhaching", "Energie Cottbus": "FC Energie Cottbus",
+  "Hansa Rostock": "F.C. Hansa Rostock",
   "Man City": "Manchester City", "Man United": "Manchester United",
   "Liverpool": "FC Liverpool", "Arsenal": "FC Arsenal", "Chelsea": "FC Chelsea",
   "Tottenham": "Tottenham Hotspur", "Newcastle": "Newcastle United",
@@ -2727,6 +2733,11 @@ const KLUB_WIKI = {
   "Holstein Kiel": "Holstein Kiel", "Hamburger SV": "Hamburger SV",
   "1. FC Köln": "1. FC Köln", "Kaiserslautern": "1. FC Kaiserslautern",
   "Hannover 96": "Hannover 96", "1. FC Nürnberg": "1. FC Nürnberg",
+  "1860 München": "TSV 1860 München", "Energie Cottbus": "Energie Cottbus",
+  "Hansa Rostock": "F.C. Hansa Rostock", "MSV Duisburg": "MSV Duisburg",
+  "Karlsruher SC": "Karlsruher SC", "Alemannia Aachen": "Alemannia Aachen",
+  "Fortuna Düsseldorf": "Fortuna Düsseldorf", "Paderborn": "SC Paderborn 07",
+  "Eintracht Braunschweig": "Eintracht Braunschweig", "Unterhaching": "SpVgg Unterhaching",
   "Porto": "FC Porto", "Feyenoord": "Feyenoord Rotterdam", "Celtic": "Celtic Glasgow",
   "Athletic Bilbao": "Athletic Bilbao", "Celta Vigo": "Celta Vigo", "Betis": "Betis Sevilla",
   "Lazio": "Lazio Rom", "Atalanta": "Atalanta Bergamo", "Bologna": "FC Bologna",
@@ -2846,6 +2857,39 @@ function kandidaten(zeile, spalte) {
   return SPIELER.filter(s => passtZuKriterium(s, zeile) && passtZuKriterium(s, spalte));
 }
 
+// Index Kriterium→Spieler-Set für die Rastersuche: bei ~7000 Spielern ist der
+// wiederholte Voll-Scan über kandidaten() zu langsam (Sekunden pro Raster auf
+// „Schwer"). Einmal aufgebaut, danach Schnitt zweier Sets mit Früh-Abbruch.
+let KRIT_INDEX = null;
+function kritIndex() {
+  if (KRIT_INDEX) return KRIT_INDEX;
+  KRIT_INDEX = new Map();
+  const merk = (key, s) => {
+    let set = KRIT_INDEX.get(key);
+    if (!set) KRIT_INDEX.set(key, set = new Set());
+    set.add(s);
+  };
+  SPIELER.forEach(s => {
+    s.klubs.forEach(k => merk("verein|" + k, s));
+    if (s.land) merk("land|" + s.land, s);
+    s.ligen.forEach(l => merk("liga|" + l, s));
+    s.ligaSieger.forEach(l => merk("ligasieger|" + l, s));
+    for (const p of ["wm", "cl", "em"]) if (s[p]) merk("pokal|" + p, s);
+  });
+  return KRIT_INDEX;
+}
+
+// Haben die beiden Kriterien mindestens `minimum` gemeinsame Spieler?
+function kandidatenMindestens(a, b, minimum) {
+  const idx = kritIndex();
+  const sa = idx.get(kritKey(a)), sb = idx.get(kritKey(b));
+  if (!sa || !sb) return false;
+  const [klein, gross] = sa.size <= sb.size ? [sa, sb] : [sb, sa];
+  let n = 0;
+  for (const s of klein) if (gross.has(s) && ++n >= minimum) return true;
+  return false;
+}
+
 // Kriterien-Pool je nach Schwierigkeit und aktiven Arten.
 // starMin = Mindestzahl an Star-Spielern (nicht-licht), damit ein Verein/eine
 // Nation als Kriterium auftaucht — steuert, wie bekannt die Kriterien sind.
@@ -2926,7 +2970,7 @@ function neuesTtt() {
         if (zeilen.length < 3) break;
         const passende = mische(alle.filter(k =>
           !zeilen.includes(k) &&
-          zeilen.every(z => !trivialesPaar(z, k) && kandidaten(z, k).length >= minimum)
+          zeilen.every(z => !trivialesPaar(z, k) && kandidatenMindestens(z, k, minimum))
         ));
         if (passende.length >= 3) {
           ttt.zeilen = zeilen;
