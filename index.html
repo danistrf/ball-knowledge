@@ -1819,7 +1819,7 @@
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script src="spieler.js?v=5"></script>
-<script src="spieler-bundesliga.js?v=3"></script>
+<script src="spieler-bundesliga.js?v=5"></script>
 <script>
 // Normalisiert Namen für die Suche: Akzente/Sonderzeichen -> einfache Buchstaben,
 // damit man z. B. "kante" -> "Kanté", "gundogan" -> "Gündoğan",
@@ -1933,7 +1933,68 @@ const VEREINSFARBEN = {
   "Rangers": ["#1b458f","#ffffff"], "Galatasaray": ["#a90432","#fdb912"],
   "Fenerbahçe": ["#ffed00","#00235d"], "Beşiktaş": ["#000000","#ffffff"],
   "Club Brügge": ["#0057b7","#000000"], "Al-Nassr": ["#ffe600","#01357e"],
-  "Al-Hilal": ["#1651a5","#ffffff"]
+  "Al-Hilal": ["#1651a5","#ffffff"],
+  // Klubs aus den vollen Karriere-Historien (2026-07-26, >=10 Spieler)
+  "CFC Genua": ["#a71930","#0e2240"], "Basel": ["#e2001a","#0033a0"],
+  "Nottingham Forest": ["#dd0000","#ffffff"], "RSC Anderlecht": ["#5b3d8f","#ffffff"],
+  "FC Empoli": ["#005ba5","#ffffff"], "OGC Nizza": ["#e30613","#000000"],
+  "FC Girona": ["#d00027","#ffffff"], "Deportivo Alavés": ["#004a98","#ffffff"],
+  "Real Valladolid": ["#6f2c91","#ffffff"], "Deportivo A Coruña": ["#0068b4","#ffffff"],
+  "Wolverhampton Wanderers": ["#fdb913","#231f20"], "Parma Calcio 1913": ["#ffd700","#003a70"],
+  "FC Granada": ["#c8102e","#ffffff"], "FC Liefering": ["#e2001a","#ffffff"],
+  "SD Eibar": ["#88001b","#004b93"], "Dinamo Zagreb": ["#0048ab","#ffffff"],
+  "CA Osasuna": ["#d91a21","#0a346f"], "US Sassuolo Calcio": ["#00a752","#000000"],
+  "Olympiakos Piräus": ["#dc1e28","#ffffff"], "CD Leganés": ["#0053a0","#ffffff"],
+  "FC Kopenhagen": ["#ffffff","#0d2c54"], "Norwich City": ["#fff200","#00a650"],
+  "Hull City": ["#f5971d","#000000"], "River Plate": ["#ffffff","#eb1c2d"],
+  "Cardiff City": ["#0070b5","#ffffff"], "FC Middlesbrough": ["#e21836","#ffffff"],
+  "Standard Lüttich": ["#e30613","#ffffff"], "Boca Juniors": ["#103f79","#ffd500"],
+  "Ipswich Town": ["#0044a9","#ffffff"], "FC Toulouse": ["#5f259f","#ffffff"],
+  "CD Mirandés": ["#d6001c","#000000"], "Hellas Verona": ["#facf00","#002d56"],
+  "Wigan Athletic": ["#005cab","#ffffff"], "FC Reading": ["#ffffff","#004494"],
+  "Levante UD": ["#b4053f","#005999"], "AS Saint-Étienne": ["#009c46","#ffffff"],
+  "Racing Straßburg": ["#009fe3","#ffffff"], "Sporting Braga": ["#d20a11","#ffffff"],
+  "West Bromwich Albion": ["#122f67","#ffffff"], "Karlsruher SC": ["#004b95","#ffffff"],
+  "Flamengo": ["#e30613","#000000"], "Birmingham": ["#223b8f","#ffffff"],
+  "Sheffield United": ["#ee2737","#ffffff"], "SC Paderborn 07": ["#005ca9","#000000"],
+  "Blackburn Rovers": ["#009ee0","#ffffff"], "Queens Park Rangers": ["#005cab","#ffffff"],
+  "FC Zürich": ["#ffffff","#0a3a7d"], "Sporting Gijón": ["#e30613","#ffffff"],
+  "Rayo Vallecano": ["#ffffff","#e30613"], "FC Lorient": ["#f36f21","#000000"],
+  "Spezia Calcio": ["#ffffff","#000000"], "Swansea City": ["#ffffff","#000000"],
+  "FC Twente Enschede": ["#d3103c","#ffffff"], "Grêmio": ["#0d80bf","#000000"],
+  "Hansa Rostock": ["#005ca9","#ffffff"], "Real Saragossa": ["#ffffff","#003da5"],
+  "Schachtar Donezk": ["#f36f21","#000000"], "U.S. Lecce": ["#ffd800","#da291c"],
+  "TSV 1860 München": ["#6ab2e2","#ffffff"], "Delfino Pescara 1936": ["#ffffff","#0090d4"],
+  "FC Málaga": ["#2e9bd6","#ffffff"], "FC Cádiz": ["#ffe500","#004a98"],
+  "Royal Antwerpen": ["#d6001c","#ffffff"], "Eintracht Braunschweig": ["#ffd500","#003f8a"],
+  "BSC Young Boys": ["#ffd800","#000000"], "SCO Angers": ["#000000","#ffffff"],
+  "Chievo Verona": ["#ffdd00","#003da5"], "Real Oviedo": ["#0050a0","#ffffff"],
+  "AEK Athen": ["#ffd200","#000000"], "Fortuna Düsseldorf": ["#da251d","#ffffff"],
+  "Grasshopper Club Zürich": ["#0053a1","#ffffff"], "Stade Brest": ["#e30613","#ffffff"],
+  "Fluminense FC": ["#870a28","#00613c"], "KAA Gent": ["#004a97","#ffffff"],
+  "Al-Ahli": ["#00693e","#ffffff"], "FC Crotone": ["#e30613","#003da5"],
+  "Royale Union Saint-Gilloise": ["#ffd500","#00447c"], "FCO Dijon": ["#d20a11","#ffffff"],
+  "Oud-Heverlee Löwen": ["#ffffff","#007a3d"], "UD Almería": ["#ee1119","#ffffff"],
+  "Le Havre AC": ["#79b0d8","#0a2240"], "Panathinaikos Athen": ["#00693e","#ffffff"],
+  "Ascoli Calcio": ["#ffffff","#000000"], "NAC Breda": ["#ffd700","#000000"],
+  "Racing de Santander": ["#ffffff","#00964b"], "Cercle Brügge": ["#009344","#000000"],
+  "Huddersfield Town": ["#0e63ad","#ffffff"], "FC São Paulo": ["#ffffff","#fe0000"],
+  "FK Roter Stern Belgrad": ["#d6001c","#ffffff"], "Derby County": ["#ffffff","#000000"],
+  "FC Portsmouth": ["#001489","#ffffff"], "AC Perugia Calcio": ["#ba0716","#ffffff"],
+  "FC Sochaux": ["#ffd500","#00387b"], "SD Huesca": ["#0d2f6d","#96172e"],
+  "U.S. Salernitana 1919": ["#952128","#ffffff"], "FC Elche": ["#ffffff","#008542"],
+  "Charlton Athletic": ["#d4021d","#ffffff"], "SpVgg Unterhaching": ["#e30613","#004f9f"],
+  "Palmeiras São Paulo": ["#006437","#ffffff"], "FC Millwall": ["#001d5e","#ffffff"],
+  "Willem II Tilburg": ["#d6001c","#0033a0"], "ES Troyes AC": ["#004170","#ffffff"],
+  "SK Rapid Wien": ["#008542","#ffffff"], "Corinthians São Paulo": ["#ffffff","#000000"],
+  "Cruzeiro Belo Horizonte": ["#003da5","#ffffff"], "Trabzonspor": ["#7a1533","#5db7e4"],
+  "Al-Ittihad": ["#ffd500","#000000"], "Bristol City": ["#e21c38","#ffffff"],
+  "FK Partizan": ["#000000","#ffffff"], "Dynamo Kiew": ["#ffffff","#0057b8"],
+  "Başakşehir FK": ["#12264f","#f26522"], "AJ Auxerre": ["#ffffff","#003da5"],
+  "FK Austria Wien": ["#5b2b82","#ffffff"], "Yeovil Town": ["#00964b","#ffffff"],
+  "AC Monza": ["#e30613","#ffffff"], "FC Metz": ["#7d0230","#ffffff"],
+  "Hajduk Split": ["#ffffff","#003893"], "CFR Cluj": ["#7d1424","#ffffff"],
+  "Bolton Wanderers": ["#ffffff","#00285e"], "VfL Osnabrück": ["#5b2d8e","#ffffff"]
 };
 
 // Nationalfarben (zwei dominante Flaggenfarben) für die Nationen-Kriterien
@@ -2011,7 +2072,51 @@ const VEREINS_KUERZEL = {
   "RB Salzburg": "SAL", "Genk": "GNK", "Benfica": "SLB", "Porto": "FCP",
   "Sporting": "SCP", "Celtic": "CLT", "Rangers": "RAN", "Galatasaray": "GAL",
   "Fenerbahçe": "FEN", "Beşiktaş": "BJK", "Club Brügge": "BRU",
-  "Al-Nassr": "ALN", "Al-Hilal": "ALH"
+  "Al-Nassr": "ALN", "Al-Hilal": "ALH",
+  // Klubs aus den vollen Karriere-Historien (2026-07-26)
+  "CFC Genua": "GEN", "Basel": "BAS", "Nottingham Forest": "NFO",
+  "RSC Anderlecht": "AND", "FC Empoli": "EMP", "OGC Nizza": "NIZ",
+  "FC Girona": "GIR", "Deportivo Alavés": "ALA", "Real Valladolid": "VLL",
+  "Deportivo A Coruña": "DEP", "Wolverhampton Wanderers": "WOL",
+  "Parma Calcio 1913": "PAR", "FC Granada": "GRA", "FC Liefering": "LIE",
+  "SD Eibar": "EIB", "Dinamo Zagreb": "DZG", "CA Osasuna": "OSA",
+  "US Sassuolo Calcio": "SAS", "Olympiakos Piräus": "OLY", "CD Leganés": "LEG",
+  "FC Kopenhagen": "KOP", "Norwich City": "NOR", "Hull City": "HUL",
+  "River Plate": "RIV", "Cardiff City": "CAR", "FC Middlesbrough": "MID",
+  "Standard Lüttich": "STA", "Boca Juniors": "BOJ", "Ipswich Town": "IPS",
+  "FC Toulouse": "TFC", "CD Mirandés": "MIR", "Hellas Verona": "VER",
+  "Wigan Athletic": "WIG", "FC Reading": "REA", "Levante UD": "LEV",
+  "AS Saint-Étienne": "ASSE", "Racing Straßburg": "RCS", "Sporting Braga": "SCB",
+  "West Bromwich Albion": "WBA", "Karlsruher SC": "KSC", "Flamengo": "FLA",
+  "Birmingham": "BIR", "Sheffield United": "SHU", "SC Paderborn 07": "PAD",
+  "Blackburn Rovers": "BLB", "Queens Park Rangers": "QPR", "FC Zürich": "FCZ",
+  "Sporting Gijón": "GIJ", "Rayo Vallecano": "RAY", "FC Lorient": "LOR",
+  "Spezia Calcio": "SPE", "Swansea City": "SWA", "FC Twente Enschede": "TWE",
+  "Grêmio": "GRE", "Hansa Rostock": "HRO", "Real Saragossa": "ZAR",
+  "Schachtar Donezk": "SHA", "U.S. Lecce": "LEC", "TSV 1860 München": "M60",
+  "Delfino Pescara 1936": "PES", "FC Málaga": "MAL", "FC Cádiz": "CAD",
+  "Royal Antwerpen": "ANT", "Eintracht Braunschweig": "BTSV",
+  "BSC Young Boys": "YB", "SCO Angers": "SCO", "Chievo Verona": "CHV",
+  "Real Oviedo": "OVI", "AEK Athen": "AEK", "Fortuna Düsseldorf": "F95",
+  "Grasshopper Club Zürich": "GCZ", "Stade Brest": "SB29",
+  "Fluminense FC": "FLU", "KAA Gent": "GNT", "Al-Ahli": "AHL",
+  "FC Crotone": "CRT", "Royale Union Saint-Gilloise": "USG",
+  "FCO Dijon": "DIJ", "Oud-Heverlee Löwen": "OHL", "UD Almería": "ALM",
+  "Le Havre AC": "HAC", "Panathinaikos Athen": "PAO", "Ascoli Calcio": "ASC",
+  "NAC Breda": "NAC", "Racing de Santander": "RAC", "Cercle Brügge": "CER",
+  "Huddersfield Town": "HUD", "FC São Paulo": "SPFC",
+  "FK Roter Stern Belgrad": "CZV", "Derby County": "DER",
+  "FC Portsmouth": "POM", "AC Perugia Calcio": "PER", "FC Sochaux": "FCSM",
+  "SD Huesca": "HUE", "U.S. Salernitana 1919": "SLN", "FC Elche": "ELC",
+  "Charlton Athletic": "CHA", "SpVgg Unterhaching": "UNT",
+  "Palmeiras São Paulo": "PLM", "FC Millwall": "MLW",
+  "Willem II Tilburg": "WIL", "ES Troyes AC": "TRO", "SK Rapid Wien": "RAP",
+  "Corinthians São Paulo": "COR", "Cruzeiro Belo Horizonte": "CRZ",
+  "Trabzonspor": "TRA", "Al-Ittihad": "ITT", "Bristol City": "BRC",
+  "FK Partizan": "FKP", "Dynamo Kiew": "DYN", "Başakşehir FK": "IBFK",
+  "AJ Auxerre": "AUX", "FK Austria Wien": "FAK", "Yeovil Town": "YEO",
+  "AC Monza": "MON", "FC Metz": "MET", "Hajduk Split": "HAJ",
+  "CFR Cluj": "CFR", "Bolton Wanderers": "BWFC", "VfL Osnabrück": "OSN"
 };
 
 // Vollständige Vereinsnamen für die Anzeige (Daniels Wunsch 2026-07-26:
@@ -2063,7 +2168,12 @@ const VEREINS_VOLLNAME = {
   "Sporting": "Sporting Lissabon", "Celtic": "Celtic Glasgow",
   "Rangers": "Glasgow Rangers", "Galatasaray": "Galatasaray Istanbul",
   "Fenerbahçe": "Fenerbahçe Istanbul", "Beşiktaş": "Beşiktaş Istanbul",
-  "Al-Nassr": "Al-Nassr FC"
+  "Al-Nassr": "Al-Nassr FC",
+  // Klubs aus den vollen Karriere-Historien (2026-07-26). Die meisten
+  // Wikidata-Labels sind schon Vollnamen — hier nur die Kurzformen.
+  "Basel": "FC Basel", "Flamengo": "Flamengo Rio de Janeiro",
+  "Grêmio": "Grêmio Porto Alegre", "Birmingham": "Birmingham City",
+  "Al-Ahli": "Al-Ahli FC", "Al-Ittihad": "Al-Ittihad FC"
 };
 function vereinVollname(name) { return VEREINS_VOLLNAME[name] || name; }
 
