@@ -2554,9 +2554,32 @@ $("btnShare").addEventListener("click", () => {
 });
 
 // ---------- Logik ----------
+// Mischverhältnis je Schwierigkeit: aus welcher Spieler-Stufe kommt die
+// nächste Ziehung? Rein kumulative Pools fühlten sich zu ähnlich an
+// (auf „Schwer" waren 78 % des Pools Leicht-/Mittel-Spieler). Genutzt von
+// Höher/Niedriger UND Karriere-Raten.
+const STUFEN_MIX = {
+  1: { 1: 1 },
+  2: { 1: 3, 2: 7 },
+  3: { 1: 1, 2: 3, 3: 6 }
+};
+
+function ausMixZiehen(pool, mix) {
+  const summe = Object.values(mix).reduce((a, b) => a + b, 0);
+  let rest = Math.random() * summe;
+  let ziel = null;
+  for (const [st, gewicht] of Object.entries(mix)) {
+    rest -= gewicht;
+    if (rest <= 0) { ziel = Number(st); break; }
+  }
+  const treffer = pool.filter(s => s.stufe === ziel);
+  const quelle = treffer.length ? treffer : pool; // leere Ziel-Stufe → Gesamt-Pool
+  return quelle[Math.floor(Math.random() * quelle.length)];
+}
+
 function zufallsSpieler(ausser = []) {
   const pool = SPIELER.filter(s => s.stufe <= maxStufe && !ausser.includes(s));
-  return pool[Math.floor(Math.random() * pool.length)];
+  return ausMixZiehen(pool, STUFEN_MIX[maxStufe]);
 }
 
 function neueKategorie() {
@@ -2871,7 +2894,27 @@ function tttKriterienPool(stufe) {
 }
 
 function neuesTtt() {
-  const mische = arr => [...arr].sort(() => Math.random() - 0.5);
+  // Gewichtetes Mischen: unbekanntere Kriterien bekommen auf höheren Stufen
+  // mehr Gewicht, sonst dominieren die Giganten-Klubs auch auf „Schwer"
+  // (vorher landeten dort 48 % Leicht-Kriterien im Raster).
+  const leichtKeys = new Set(tttKriterienPool(1).alle.map(kritKey));
+  const mittelKeys = new Set(tttKriterienPool(2).alle.map(kritKey));
+  const KRIT_GEWICHTE = {
+    1: { leicht: 1, mittel: 1, schwer: 1 },
+    2: { leicht: 0.6, mittel: 3, schwer: 3 },
+    3: { leicht: 1, mittel: 2, schwer: 5 }
+  };
+  const kritKlasse = k => leichtKeys.has(kritKey(k)) ? "leicht"
+    : mittelKeys.has(kritKey(k)) ? "mittel" : "schwer";
+  // Gewichtete Zufallsreihenfolge (Efraimidis-Spirakis): höheres Gewicht =
+  // weiter vorne wahrscheinlicher; Gewicht 1 überall = normales Mischen.
+  const mische = arr => {
+    const g = KRIT_GEWICHTE[tttStufe];
+    return [...arr]
+      .map(k => ({ k, sort: Math.random() ** (1 / g[kritKlasse(k)]) }))
+      .sort((a, b) => b.sort - a.sort)
+      .map(x => x.k);
+  };
   // Sanfter Fallback, falls die gewählte Stufe kein Raster hergibt:
   // Leicht → Mittel → Schwer, Mittel → Schwer.
   const stufen = tttStufe === 1 ? [1, 2, 3] : tttStufe === 2 ? [2, 3] : [3];
@@ -3428,7 +3471,7 @@ function karStartGame() {
 
 function neueKarriereRunde() {
   kar.pool = SPIELER.filter(s => !s.licht && s.stufe <= kar.stufe && s.klubs.length >= 2);
-  kar.spieler = kar.pool[Math.floor(Math.random() * kar.pool.length)];
+  kar.spieler = ausMixZiehen(kar.pool, STUFEN_MIX[kar.stufe]);
   kar.hinweise = kar.spieler.klubs.map(k => ({ typ: "klub", wert: k }));
   kar.hinweise.push({ typ: "land", wert: kar.spieler.land });
   if (kar.spieler.alter) kar.hinweise.push({ typ: "alter", wert: kar.spieler.alter });
