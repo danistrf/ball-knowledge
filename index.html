@@ -1,0 +1,3412 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚽ Ball-Knowledge</title>
+<meta name="description" content="Fußball-Ratespiele: Höher oder Niedriger, Fußball Tic-Tac-Toe und Karriere-Raten. Wie gut ist dein Fußballwissen?">
+<meta name="theme-color" content="#0b141f">
+<!-- Favicon: Sticker-Logo (Variante B) als eingebettetes SVG (keine extra Datei nötig) -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Cg%20transform='rotate(7%2032%2032)'%3E%3Crect%20x='6'%20y='6'%20width='52'%20height='52'%20rx='14'%20fill='%2300a651'%20stroke='%23fff'%20stroke-width='5'/%3E%3Ctext%20x='32'%20y='43'%20font-family='Arial,sans-serif'%20font-size='27'%20font-weight='900'%20text-anchor='middle'%20fill='%23fff'%3EB%3Ctspan%20fill='%23ffc400'%3EK%3C/tspan%3E%3C/text%3E%3C/g%3E%3C/svg%3E">
+<!-- Social-Vorschau (Open Graph). og:image/og:url müssen absolute URLs sein;
+     bei Domain-Wechsel (eigene Domain) hier anpassen! -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Ball-Knowledge – Wie gut ist dein Fußballwissen?">
+<meta property="og:description" content="Fußball-Ratespiele: Höher oder Niedriger, Fußball Tic-Tac-Toe und Karriere-Raten. Probier's aus!">
+<meta property="og:url" content="https://bydnhhp7sd-dotcom.github.io/ball-knowledge/">
+<meta property="og:image" content="https://bydnhhp7sd-dotcom.github.io/ball-knowledge/og-image.png">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #eef1f4;
+    --surface: #ffffff;
+    --ink: #0e1a2b;
+    --muted: #5b6b7c;
+    --green: #00a651;
+    --green-dark: #008542;
+    --green-tint: #e5f6ec;
+    --red: #e4032e;
+    --red-dark: #c00227;
+    --red-tint: #fdeaee;
+    --yellow: #ffc400;
+    --line: #dde3ea;
+    --panel: #0e1a2b;
+    --shadow: 0 2px 10px rgba(14, 26, 43, 0.08);
+    --shadow-lift: 0 10px 24px rgba(14, 26, 43, 0.14);
+    --font-head: "Barlow Condensed", "Arial Narrow", sans-serif;
+    --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
+  }
+
+  /* ---------- Dark-Theme „Stadion bei Nacht" ---------- */
+  :root[data-theme="dark"] {
+    --bg: #0c1622;
+    --surface: #16212f;
+    --ink: #eaf1f7;
+    --muted: #93a6b8;
+    --green: #22c55e;
+    --green-dark: #1aa34a;
+    --green-tint: #12301f;
+    --red: #f26d78;
+    --red-dark: #e0505d;
+    --red-tint: #3a1c20;
+    --yellow: #ffce55;
+    --line: #2b3a4a;
+    --panel: #1b2a3a;
+    --shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+    --shadow-lift: 0 12px 28px rgba(0, 0, 0, 0.55);
+  }
+  /* Komponenten mit fest verdrahteten Hellfarben für Dark nachziehen.
+     Eingabefelder (#pickerInput/#bombeInput) sind bewusst weiß mit dunkler
+     Schrift – deshalb hier NICHT die Textfarbe überschreiben. */
+  :root[data-theme="dark"] select,
+  :root[data-theme="dark"] #pickerListe button,
+  :root[data-theme="dark"] #bombeListe button { color: var(--ink); }
+  :root[data-theme="dark"] .gpCard { background: linear-gradient(160deg, #20303f, #182533); }
+  :root[data-theme="dark"] .gpGrid span,
+  :root[data-theme="dark"] .tttZelle { background: linear-gradient(160deg, #1c2b3a, #15202d); }
+  :root[data-theme="dark"] .gpGrid .x { color: #22c55e; }
+  :root[data-theme="dark"] .gpGrid .o { color: #38bdf8; }
+  :root[data-theme="dark"] .gpCardQ .gpNum { color: #22c55e; }
+  :root[data-theme="dark"] #rightValue { color: #22c55e; }
+  :root[data-theme="dark"] .tttZelle.rot  { border-color: #22c55e; background: #12301f; }
+  :root[data-theme="dark"] .tttZelle.blau { border-color: #38bdf8; background: #0f2740; }
+  :root[data-theme="dark"] .tttZelle.loesung { background: #1a2634; }
+  :root[data-theme="dark"] .tttZelle.rot  .zSymbol { color: #22c55e; }
+  :root[data-theme="dark"] .tttZelle.blau .zSymbol { color: #38bdf8; }
+  :root[data-theme="dark"] #tttStatus .rot  { color: #4ade80; }
+  :root[data-theme="dark"] #tttStatus .blau { color: #7cc4ff; }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-body);
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ---------- Top-Leiste ---------- */
+  #topbar {
+    width: 100%;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 10px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+
+  #btnHome {
+    justify-self: start;
+    background: transparent;
+    border: 2px solid var(--green);
+    color: var(--green-dark);
+    border-radius: 999px;
+    padding: 7px 16px;
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    visibility: hidden;
+  }
+  #btnHome:hover { background: var(--green); color: #fff; }
+
+  #logo {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    cursor: pointer;
+    user-select: none;
+  }
+  /* Sticker-Logo (Daniel wählte Variante B, 2026-07-26): gekipptes Badge mit
+     weißem Rand + gelbem K. Arial statt Webfont, damit Header, Favicon und
+     OG-Bild identisch aussehen (SVG-Favicons können keine Webfonts laden). */
+  .logoBadge {
+    width: 40px;
+    height: 40px;
+    flex: none;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
+  }
+  .logoWort {
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 1.45rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .logoWort em {
+    font-style: normal;
+    color: var(--green);
+  }
+
+  /* Hamburger + Seitenmenü */
+  .topbarLeft { justify-self: start; display: flex; align-items: center; gap: 10px; }
+  #btnMenu {
+    background: transparent; border: none; color: var(--ink);
+    font-size: 1.5rem; line-height: 1; padding: 4px 8px;
+    border-radius: 8px; cursor: pointer; transition: background 0.15s;
+  }
+  #btnMenu:hover { background: var(--bg); }
+  #sidebarBackdrop {
+    position: fixed; inset: 0; background: rgba(14,26,43,0.45);
+    z-index: 35; opacity: 0; visibility: hidden; transition: opacity 0.25s;
+  }
+  #sidebarBackdrop.offen { opacity: 1; visibility: visible; }
+  #sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: 272px; max-width: 82vw;
+    background: var(--surface); box-shadow: 2px 0 24px rgba(14,26,43,0.20);
+    z-index: 40; transform: translateX(-100%); transition: transform 0.25s ease;
+    display: flex; flex-direction: column; padding: 14px 14px 20px;
+  }
+  #sidebar.offen { transform: translateX(0); }
+  .sbHeader {
+    display: flex; align-items: center; gap: 10px;
+    padding: 4px 4px 14px; border-bottom: 1px solid var(--line);
+  }
+  .sbTitle {
+    font-family: var(--font-head); font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1px; font-size: 1.2rem; flex: 1;
+  }
+  #btnSidebarClose {
+    background: transparent; border: none; font-size: 1.1rem; color: var(--muted);
+    cursor: pointer; padding: 4px 8px; border-radius: 8px;
+  }
+  #btnSidebarClose:hover { background: var(--bg); color: var(--ink); }
+  .sbNav { display: flex; flex-direction: column; gap: 4px; margin-top: 10px; }
+  .sbSection {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1.2px; color: var(--muted); margin: 12px 8px 4px;
+  }
+  .sbLink {
+    display: flex; align-items: center; gap: 10px;
+    background: transparent; border: none; text-align: left; width: 100%;
+    padding: 11px 12px; border-radius: 10px;
+    font-family: var(--font-body); font-size: 1rem; font-weight: 600; color: var(--ink);
+    cursor: pointer; transition: background 0.15s;
+  }
+  .sbLink:hover:not([disabled]) { background: var(--green-tint); }
+  .sbLink[disabled] { color: #9aa7b4; cursor: default; }
+
+  /* ---------- Seitenkopf ---------- */
+  header {
+    width: 100%;
+    text-align: center;
+    padding: 30px 16px 8px;
+  }
+  header h1 {
+    font-family: var(--font-head);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-size: clamp(1.8rem, 5vw, 2.7rem);
+    line-height: 1.1;
+  }
+  header h1::after {
+    content: "";
+    display: block;
+    width: 64px;
+    height: 5px;
+    background: var(--green);
+    border-radius: 3px;
+    margin: 10px auto 0;
+  }
+  header p { color: var(--muted); margin-top: 10px; font-size: 0.98rem; }
+
+  /* ---------- Startseite (Spielauswahl) ---------- */
+  #homeScreen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    margin-top: 26px;
+    padding: 0 16px;
+    text-align: center;
+  }
+  .gameCards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    justify-content: center;
+    max-width: 760px;
+  }
+  /* Desktop: alle Spiele nebeneinander in EINER Reihe (kein vertikales Scrollen
+     für den vollen Überblick). Handy bleibt gestapelt (Scrollen erlaubt). */
+  @media (min-width: 860px) {
+    .gameCards { flex-wrap: nowrap; max-width: 820px; align-items: stretch; }
+    .gameCards .gameCard {
+      flex: 0 1 250px; min-width: 0;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .gameCards .gcCta { margin-top: auto; }
+  }
+  .gameCard {
+    position: relative;
+    --acc: var(--green);
+    background: linear-gradient(155deg, color-mix(in srgb, var(--acc) 26%, var(--surface)) 0%, var(--surface) 78%);
+    border: 1px solid color-mix(in srgb, var(--acc) 42%, var(--line));
+    border-radius: 16px;
+    padding: 24px 18px 20px;
+    width: 250px;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: transform 0.18s, box-shadow 0.18s;
+  }
+  .gameCard::before { content: none; }
+  .gameCard:hover { transform: translateY(-5px); box-shadow: var(--shadow-lift); }
+  /* Akzentfarbe je Spiel (hell/dunkel getrennt für Kontrast) */
+  #cardTtt { --acc: #0d6fce; }
+  #cardKarriere { --acc: #7c3aed; }
+  :root[data-theme="dark"] #cardTtt { --acc: #38bdf8; }
+  :root[data-theme="dark"] #cardKarriere { --acc: #a78bfa; }
+  .gameCard .gcIcon {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 12px;
+    background: var(--green-tint);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.7rem;
+  }
+  /* Mini-Vorschau je Spiel: man erkennt sofort, wie das Spiel aussieht */
+  .gameCard .gcPreview {
+    height: 96px; margin: 4px auto 14px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  /* Höher oder Niedriger: zwei Karten + VS + Pfeile */
+  .gpCard {
+    width: 60px; height: 80px; border-radius: 10px; position: relative;
+    background: linear-gradient(160deg, #ffffff, #eef4f8);
+    border: 2px solid var(--line); box-shadow: var(--shadow);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .gpCard::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: var(--green); border-radius: 8px 8px 0 0;
+  }
+  .gpNum { font-family: var(--font-head); font-weight: 800; font-size: 1.5rem; color: var(--ink); }
+  .gpCardQ .gpNum { color: var(--green-dark); }
+  .gpArrows { display: flex; gap: 4px; margin-top: 4px; font-size: 0.6rem; }
+  .gpArrows .up { color: var(--green); } .gpArrows .down { color: var(--red); }
+  .gpVs {
+    font-family: var(--font-head); font-weight: 800; font-size: 0.78rem; color: #fff;
+    background: var(--green); border-radius: 50%; width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(0,166,81,0.35);
+  }
+  /* Tic-Tac-Toe: Mini-Raster mit grünem ✕ / blauem ◯ */
+  .gpGrid { display: grid; grid-template-columns: repeat(3, 26px); grid-auto-rows: 26px; gap: 3px; }
+  .gpGrid span {
+    background: linear-gradient(160deg, #f4f9f5, #eaf1f6);
+    border: 1.5px solid var(--line); border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-head); font-weight: 800; font-size: 0.95rem; -webkit-text-stroke: 0.8px currentColor;
+  }
+  .gpGrid .x { color: #08924a; } .gpGrid .o { color: #0d6fce; }
+
+  .gameCard .gcTitle {
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-size: 1.3rem;
+    margin-bottom: 6px;
+  }
+  .gameCard .gcDesc { font-size: 0.86rem; color: var(--muted); line-height: 1.45; }
+  .gameCard .gcCta {
+    display: inline-block;
+    margin-top: 14px;
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.92rem;
+    color: #fff;
+    background: var(--acc);
+    border-radius: 999px;
+    padding: 7px 20px;
+    transition: filter 0.15s;
+  }
+  :root[data-theme="dark"] .gameCard .gcCta { color: #0b1220; }
+  .gameCard:hover .gcCta { filter: brightness(1.08); }
+  .gameCard.bald {
+    --acc: var(--line);
+    background: transparent;
+    cursor: default;
+    border-style: dashed;
+    box-shadow: none;
+  }
+  .gameCard.bald .gcIcon { background: var(--bg); }
+  .gameCard.bald .gcTitle, .gameCard.bald .gcDesc { color: #9aa7b4; }
+  .gameCard.bald:hover { transform: none; box-shadow: none; }
+
+  /* ---------- Kategorien-Auswahl ---------- */
+  #startScreen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    margin-top: 22px;
+    padding: 0 16px;
+    text-align: center;
+  }
+  #startScreen h2 {
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1.35rem;
+  }
+  .chipGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    justify-content: center;
+    max-width: 600px;
+  }
+  .chip {
+    border: 1.5px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 9px 17px;
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+  }
+  .chip:hover { transform: translateY(-2px); border-color: var(--green); }
+  .chip.aktiv {
+    background: var(--green);
+    color: #fff;
+    border-color: var(--green);
+  }
+  .startActions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  #btnAlle {
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    color: var(--muted);
+    border-radius: 10px;
+    padding: 11px 18px;
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  #btnAlle:hover { border-color: var(--muted); color: var(--ink); }
+
+  .catBtn {
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 13px 28px;
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1.15rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 166, 81, 0.35);
+    transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+  }
+  .catBtn:hover { background: var(--green-dark); transform: translateY(-2px); box-shadow: 0 7px 16px rgba(0, 166, 81, 0.4); }
+  .catBtn:disabled {
+    background: var(--line);
+    color: var(--muted);
+    cursor: default;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* ---------- Spielbereich ---------- */
+  #gameScreen { display: none; width: 100%; max-width: 920px; padding: 14px 16px 30px; }
+
+  #scoreBar {
+    background: var(--panel);
+    color: #fff;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  #scoreBar .badge {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: #aab7c4;
+  }
+  #scoreBar .badge strong {
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 1.7rem;
+    color: #fff;
+    line-height: 1;
+  }
+  #scoreBar .badge.rekord strong { color: var(--yellow); }
+  #streak.pop { animation: pop 0.45s ease; }
+  @keyframes pop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.45); color: var(--green); }
+    100% { transform: scale(1); }
+  }
+  #scoreBar .badge strong { display: inline-block; }
+
+  #categoryLabel {
+    background: var(--green);
+    color: #fff;
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 1.05rem;
+    border-radius: 8px;
+    padding: 7px 18px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  #cards {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 14px;
+    align-items: stretch;
+  }
+
+  .card {
+    position: relative;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 16px;
+    padding: 30px 20px 26px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    min-height: 300px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: var(--green);
+  }
+  .card.correct { border-color: var(--green); background: var(--green-tint); }
+  .card.wrong   { border-color: var(--red);   background: var(--red-tint); }
+  .card.wrong::before { background: var(--red); }
+
+  .card.slideIn { animation: slideIn 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+  @keyframes slideIn {
+    from { transform: translateX(60px); opacity: 0; }
+    to   { transform: translateX(0);    opacity: 1; }
+  }
+  .card.swapIn { animation: swapIn 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+  @keyframes swapIn {
+    from { transform: translateX(-40px) scale(0.96); opacity: 0.4; }
+    to   { transform: translateX(0) scale(1);        opacity: 1; }
+  }
+
+  .card .photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: top;
+    margin: 0 auto;
+    border: 4px solid var(--surface);
+    outline: 3px solid var(--green);
+    box-shadow: 0 6px 16px rgba(14, 26, 43, 0.18);
+    background: var(--bg);
+    display: none;
+  }
+  .card.wrong .photo { outline-color: var(--red); }
+  .card .emoji { font-size: 3rem; }
+  .card .name {
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-size: 1.5rem;
+    line-height: 1.15;
+  }
+  .card .meta { color: var(--muted); font-size: 0.9rem; font-weight: 500; }
+  .card .valueLabel {
+    color: var(--muted);
+    font-size: 0.76rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 4px;
+  }
+  .card .value {
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 3rem;
+    line-height: 1;
+    color: var(--ink);
+    min-height: 3rem;
+  }
+  #rightValue { color: var(--green-dark); }
+
+  #vs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #vs span {
+    background: var(--green);
+    color: #fff;
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 1.15rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 166, 81, 0.35);
+  }
+
+  #guessButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .guessBtn {
+    border: none;
+    border-radius: 10px;
+    padding: 13px;
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-size: 1.15rem;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+  }
+  .guessBtn:hover { transform: translateY(-2px); }
+  .guessBtn.up   { background: var(--green); }
+  .guessBtn.up:hover { background: var(--green-dark); }
+  .guessBtn.down { background: var(--red); }
+  .guessBtn.down:hover { background: var(--red-dark); }
+  .guessBtn:disabled { opacity: 0.45; cursor: default; transform: none; }
+
+  /* ---------- Game Over ---------- */
+  #gameOver {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin: 22px auto 0;
+    max-width: 420px;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-top: 6px solid var(--red);
+    border-radius: 14px;
+    padding: 26px 24px;
+    text-align: center;
+    box-shadow: var(--shadow-lift);
+  }
+  #gameOver h2 {
+    font-family: var(--font-head);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-size: 1.9rem;
+    color: var(--red);
+  }
+  #gameOver .finalScore { font-size: 1rem; color: var(--muted); }
+  .shareBtn {
+    background: transparent;
+    color: var(--green);
+    border: 2px solid var(--green);
+    border-radius: 10px;
+    padding: 11px 24px;
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, transform 0.15s;
+  }
+  .shareBtn:hover { background: var(--green); color: #fff; transform: translateY(-2px); }
+
+  #toast {
+    position: fixed;
+    left: 50%;
+    bottom: 32px;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--surface);
+    color: var(--text);
+    border: 2px solid var(--green);
+    border-radius: 12px;
+    padding: 13px 22px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    box-shadow: var(--shadow-lift);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+    z-index: 3000;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ---------- Fußball Tic-Tac-Toe ---------- */
+  #tttScreen { display: none; width: 100%; max-width: 720px; padding: 14px 16px 30px; margin: 0 auto; }
+
+  #tttStatus {
+    background: var(--panel);
+    color: #fff;
+    border-radius: 12px;
+    padding: 12px 16px;
+    text-align: center;
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-size: 1.15rem;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+  }
+  #tttStatus .rot  { color: #4ade80; }
+  #tttStatus .blau { color: #57b6ff; }
+
+  #tttGrid {
+    display: grid;
+    grid-template-columns: 90px repeat(3, 1fr);
+    gap: 8px;
+  }
+  .tttKrit {
+    background: var(--panel);
+    color: #fff;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.92rem;
+    line-height: 1.2;
+    padding: 8px 6px;
+    min-height: 62px;
+  }
+  .tttKrit .kritLogo {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    background: #fff;
+    border-radius: 6px;
+    padding: 2px;
+  }
+  .tttKrit .kritLogo.pokal { height: 42px; width: 34px; }
+  .tttEcke { background: transparent; }
+  .tttZelle {
+    position: relative;
+    background: linear-gradient(160deg, #f4f9f5 0%, #eaf1f6 100%);
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    min-height: 88px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    text-align: center;
+    padding: 6px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: border-color 0.15s, transform 0.1s, box-shadow 0.15s;
+  }
+  /* Leere Felder: dezenter Ball als Wasserzeichen, damit sie nicht kahl wirken */
+  .tttZelle:not(.belegt)::before {
+    content: "⚽";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.6rem;
+    opacity: 0.10;
+    pointer-events: none;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+  .tttZelle:not(.belegt):hover {
+    border-color: var(--green);
+    transform: scale(1.03);
+    box-shadow: 0 6px 16px rgba(0,166,81,0.18);
+  }
+  .tttZelle:not(.belegt):hover::before { opacity: 0.20; transform: scale(1.1); }
+  .tttZelle.belegt { cursor: default; }
+  .tttZelle.rot  { border-color: #08924a; background: #e7f6ee; }
+  .tttZelle.blau { border-color: #0d6fce; background: #e8f3fd; }
+  .tttZelle.loesung { border-color: var(--line); background: #f1f4f7; opacity: 0.92; }
+  .tttZelle .zSymbol { font-family: var(--font-head); font-weight: 800; font-size: 1.15rem; line-height: 1; position: relative; }
+  .tttZelle.rot  .zSymbol,
+  .tttZelle.blau .zSymbol { font-size: 2.1rem; -webkit-text-stroke: 1.6px currentColor; }
+  .tttZelle.rot  .zSymbol { color: #08924a; }
+  .tttZelle.blau .zSymbol { color: #0d6fce; }
+  .tttZelle.loesung .zSymbol { color: var(--muted); font-size: 0.7rem; letter-spacing: 0.5px; -webkit-text-stroke: 0; }
+  .tttZelle .zName {
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    line-height: 1.1;
+  }
+  .tttZelle.loesung .zName { color: var(--muted); }
+
+  .tttActions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  .tttHinweis {
+    color: var(--muted);
+    font-size: 0.85rem;
+    text-align: center;
+    max-width: 520px;
+    margin: 14px auto 0;
+    line-height: 1.5;
+  }
+
+  /* ---------- Fußball-Bombe ---------- */
+  #bombeScreen { display: none; width: 100%; max-width: 640px; padding: 14px 16px 30px; margin: 0 auto; }
+  #bombeSetup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    text-align: center;
+  }
+  #bombeSetup h2 {
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1.35rem;
+  }
+  #bombeStatus {
+    background: var(--panel);
+    color: #fff;
+    border-radius: 12px;
+    padding: 14px 16px;
+    text-align: center;
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-size: 1.3rem;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  #bombeEmoji {
+    font-size: 2rem;
+    display: inline-block;
+    animation: bombPulse 1.4s infinite;
+  }
+  @keyframes bombPulse {
+    0%, 100% { transform: scale(1) rotate(-4deg); }
+    50%      { transform: scale(1.18) rotate(4deg); }
+  }
+  .bombeKat {
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-top: 6px solid var(--green);
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    margin-bottom: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .bombeKat .kritLogo {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 3px;
+  }
+  .bombeKat .katText {
+    font-family: var(--font-head);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1.5rem;
+  }
+  .bombeKat .katHilfe { color: var(--muted); font-size: 0.85rem; }
+  .bombeEingabe { position: relative; }
+  #bombeInput {
+    width: 100%;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    padding: 13px 16px;
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    outline: none;
+    box-shadow: var(--shadow);
+    background: #ffffff;
+    color: #12233a;
+  }
+  #bombeInput:focus { border-color: var(--green); }
+  #bombeInput.falsch { animation: shake 0.35s; border-color: var(--red); }
+  #bombeListe { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+  #bombeListe button {
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.12s, background 0.12s;
+  }
+  #bombeListe button:hover { border-color: var(--green); background: var(--green-tint); }
+  #bombeBenutzt {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+  }
+  #bombeBenutzt span {
+    background: var(--green-tint);
+    color: var(--green-dark);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  #bombeOver {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(14, 26, 43, 0.55);
+    z-index: 50;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  /* Tic-Tac-Toe: Einrichtung + Selbst-wählen */
+  #tttSetup, #tttCustom {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+  }
+  #tttSetup h2, #tttCustom h2 {
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1.2rem;
+    margin-top: 6px;
+  }
+  #tttSpiel { display: none; }
+  .tttCustomGrid { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .tttCustomSpalte { display: flex; flex-direction: column; gap: 8px; min-width: 210px; }
+  .tttCustomTitel {
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    font-size: 1.05rem;
+  }
+  .tttSelect {
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+    box-shadow: var(--shadow);
+  }
+  .tttSelect:focus { outline: none; border-color: var(--green); }
+  .tttWarnung { color: var(--red-dark); font-size: 0.88rem; font-weight: 600; min-height: 1.2em; margin: 0; }
+  .sekBtn {
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    color: var(--muted);
+    border-radius: 10px;
+    padding: 11px 18px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .sekBtn:hover { border-color: var(--muted); color: var(--ink); }
+
+  #tttPicker, #tttOver {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(14, 26, 43, 0.55);
+    z-index: 50;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .pickerBox, .overBox {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 22px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: var(--shadow-lift);
+    text-align: center;
+  }
+  .pickerKrit {
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+  }
+  .pickerKrit em { font-style: normal; color: var(--green-dark); }
+  #pickerInput {
+    width: 100%;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    outline: none;
+    background: #ffffff;
+    color: #12233a;
+  }
+  #pickerInput:focus { border-color: var(--green); }
+  #pickerListe { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; }
+  #pickerListe button {
+    background: var(--bg);
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.12s, background 0.12s;
+  }
+  #pickerListe button:hover { border-color: var(--green); background: var(--green-tint); }
+  #pickerListe .falsch { animation: shake 0.35s; border-color: var(--red) !important; background: var(--red-tint) !important; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+  #pickerAbbruch {
+    margin-top: 12px;
+    background: transparent;
+    border: 1.5px solid var(--line);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  #pickerAbbruch:hover { border-color: var(--muted); color: var(--ink); }
+  .overBox h2 {
+    font-family: var(--font-head);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1.7rem;
+    margin-bottom: 14px;
+  }
+
+  @media (max-width: 520px) {
+    #tttGrid { grid-template-columns: 64px repeat(3, 1fr); gap: 5px; }
+    .tttKrit { font-size: 0.72rem; min-height: 50px; padding: 5px 3px; }
+    .tttKrit .kritLogo { width: 22px; height: 22px; }
+    .tttZelle { min-height: 68px; padding: 4px; }
+    .tttZelle .zName { font-size: 0.78rem; }
+  }
+
+  /* ---------- Karriere-Raten: Home-Vorschau ---------- */
+  .gpKarriere .gpTl { display: flex; flex-direction: column; gap: 5px; width: 96px; }
+  .gpKarriere .gpBar {
+    height: 20px; border-radius: 5px; background: var(--surface);
+    border: 1.5px solid var(--line); display: flex; align-items: center; padding: 0 7px; gap: 6px;
+  }
+  .gpKarriere .gpBar .d { width: 11px; height: 11px; border-radius: 3px; background: var(--green); }
+  .gpKarriere .gpBar.q { color: var(--muted); font-weight: 800; font-family: var(--font-head); justify-content: center; }
+
+  /* ---------- Karriere-Raten: Spielbildschirm ---------- */
+  #karriereScreen { display: none; width: 100%; max-width: 620px; padding: 14px 16px 30px; margin: 0 auto; }
+  #karriereSetup { display: none; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+  #karriereSetup h2 { font-family: var(--font-head); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 1.25rem; }
+  #karriereSpiel { display: none; }
+  #karScore {
+    background: var(--panel); color: #fff; border-radius: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 14px; margin-bottom: 16px; box-shadow: var(--shadow);
+  }
+  #karScore .badge { display: flex; align-items: baseline; gap: 7px; font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #aab7c4; }
+  #karScore .badge strong { font-family: var(--font-head); font-weight: 800; font-size: 1.4rem; color: #fff; line-height: 1; }
+  #karScore .badge.rekord strong { color: var(--yellow); }
+  .karFrage { text-align: center; font-family: var(--font-head); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 1.1rem; margin-bottom: 12px; color: var(--muted); }
+  #karTimeline { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+  .karStation {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface); border: 2px solid var(--line); border-radius: 12px;
+    padding: 10px 14px; box-shadow: var(--shadow);
+  }
+  .karStation.karNeu { animation: slideIn 0.35s cubic-bezier(0.22,1,0.36,1); }
+  .karStation .karLogo { width: 34px; height: 34px; object-fit: contain; background: #fff; border-radius: 7px; padding: 2px; flex: none; }
+  .karStation .karIcon { font-size: 1.5rem; width: 34px; text-align: center; flex: none; }
+  .karStation .karName { font-family: var(--font-head); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; font-size: 1.1rem; }
+  .karStation.hinweis { border-color: var(--green); }
+  .karStation.verdeckt { opacity: 0.55; border-style: dashed; animation: none; }
+  .karStation.verdeckt .karQ { width: 34px; height: 34px; border-radius: 7px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-weight: 800; color: var(--muted); flex: none; }
+  .karStation.verdeckt .karName { color: var(--muted); }
+  .karHinweisBtn {
+    margin-left: auto; flex: none;
+    width: 36px; height: 36px; padding: 0 0 4px;
+    background: var(--green); color: #fff; border: none;
+    border-radius: 50%;
+    font-family: var(--font-body); font-weight: 400; font-size: 2.1rem; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; box-shadow: 0 2px 8px rgba(0,166,81,0.3);
+    transition: background 0.15s, transform 0.1s;
+  }
+  .karHinweisBtn:hover { background: var(--green-dark); transform: scale(1.1); }
+  #karInput {
+    width: 100%; border: 2px solid var(--line); border-radius: 10px; padding: 13px 16px;
+    font-family: var(--font-body); font-size: 1.05rem; outline: none; box-shadow: var(--shadow);
+    background: #ffffff; color: #12233a;
+  }
+  #karInput:focus { border-color: var(--green); }
+  #karInput.falsch { animation: shake 0.35s; border-color: var(--red); }
+  #karListe { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+  #karListe button {
+    background: var(--surface); border: 1.5px solid var(--line); border-radius: 8px;
+    padding: 10px 12px; font-family: var(--font-body); font-weight: 600; font-size: 0.95rem;
+    cursor: pointer; text-align: left; color: var(--ink); transition: border-color 0.12s, background 0.12s;
+  }
+  #karListe button:hover { border-color: var(--green); background: var(--green-tint); }
+  #karOver { display: none; position: fixed; inset: 0; background: rgba(14,26,43,0.55); z-index: 50; align-items: center; justify-content: center; padding: 16px; }
+  #karOverFoto img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; object-position: top; border: 3px solid var(--green); margin-bottom: 10px; }
+
+  footer {
+    margin-top: auto;
+    width: 100%;
+    padding: 16px;
+    font-size: 0.74rem;
+    color: var(--muted);
+    text-align: center;
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  @media (max-width: 640px) {
+    .logoWort { font-size: 1.2rem; }
+    #btnHome { padding: 6px 11px; font-size: 0.8rem; }
+    #cards { gap: 8px; }
+    .card { padding: 18px 10px 16px; min-height: unset; }
+    .card .photo { width: 100px; height: 100px; }
+    .card .name { font-size: 1.1rem; }
+    .card .value { font-size: 2rem; min-height: 2rem; }
+    #vs span { width: 36px; height: 36px; font-size: 0.9rem; }
+    #scoreBar .badge strong { font-size: 1.3rem; }
+    #categoryLabel { font-size: 0.85rem; padding: 6px 10px; letter-spacing: 0.8px; }
+  }
+  /* ---------- Info-Bereich auf der Startseite (Über / Regeln / FAQ) ---------- */
+  .infoBereich {
+    max-width: 780px;
+    margin: 44px auto 0;
+    text-align: left;
+    padding: 0 4px;
+  }
+  .infoBereich h2 {
+    font-family: var(--font-head);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1.45rem;
+    color: var(--ink);
+    margin: 34px 0 12px;
+  }
+  .infoBereich h2::after {
+    content: "";
+    display: block;
+    width: 64px;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--green);
+    margin-top: 6px;
+  }
+  .infoBereich > p { color: var(--muted); line-height: 1.65; margin: 0 0 12px; }
+  .infoBereich strong { color: var(--ink); }
+  .infoKarte {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  .infoKarte h3 {
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 1.1rem;
+    margin: 0 0 8px;
+    color: var(--ink);
+  }
+  .infoKarte p { color: var(--muted); line-height: 1.6; margin: 0 0 8px; }
+  .infoKarte p:last-child { margin-bottom: 0; }
+  .infoBereich details {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+  }
+  .infoBereich summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .infoBereich details p { color: var(--muted); line-height: 1.6; margin: 10px 0 2px; }
+
+  /* ---------- Darstellung ohne Wappen (Daniels Wahl 2026-07-26) ----------
+     TTT: Kürzel-Badge im TV-Ticker-Stil (Farbkasten + Kürzel).
+     Karriere-Raten: Trikot-Icon in den Vereinsfarben. */
+  .kritBadge {
+    font-family: var(--font-head);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: 7px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    flex: none;
+  }
+  @media (max-width: 520px) {
+    .kritBadge { font-size: 0.72rem; padding: 3px 5px; letter-spacing: 0.5px; }
+  }
+  .kritFlagge { font-size: 1.5rem; line-height: 1; }
+  @media (max-width: 520px) { .kritFlagge { font-size: 1.2rem; } }
+  .karTrikot { flex: none; }
+  .karTrikot svg { width: 30px; height: 26px; display: block; }
+
+  /* ---------- Impressum & Datenschutz ---------- */
+  .footerLinks { margin-top: 10px; }
+  .footerLinks button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    text-decoration: underline;
+    cursor: pointer;
+    font: inherit;
+    padding: 4px 8px; /* großzügige Tippfläche */
+  }
+  .footerLinks button:hover { color: var(--ink); }
+  #rechtOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 10, 16, 0.72);
+    z-index: 60;
+    overflow-y: auto;
+    padding: 24px 12px;
+  }
+  #rechtOverlay.offen { display: block; }
+  .rechtPanel {
+    position: relative;
+    max-width: 640px;
+    margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lift);
+    padding: 22px 20px 26px;
+    text-align: left;
+  }
+  .rechtPanel h2 {
+    font-family: var(--font-head);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1.35rem;
+    color: var(--ink);
+    margin: 22px 0 10px;
+  }
+  .rechtPanel h2:first-of-type { margin-top: 0; }
+  .rechtPanel h3 { font-size: 0.98rem; color: var(--ink); margin: 16px 0 6px; }
+  .rechtPanel p { color: var(--muted); line-height: 1.6; margin: 0 0 10px; }
+  #btnRechtZu {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 6px 10px;
+  }
+  #btnRechtZu:hover { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<nav id="topbar">
+  <div class="topbarLeft">
+    <button id="btnMenu" aria-label="Menü öffnen" title="Menü">☰</button>
+    <button id="btnHome">← Startseite</button>
+  </div>
+  <div id="logo" title="Zur Startseite">
+    <svg class="logoBadge" viewBox="0 0 64 64" aria-hidden="true">
+      <defs><linearGradient id="logoGrad1" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#00c463"/><stop offset="1" stop-color="#007a3d"/>
+      </linearGradient></defs>
+      <g transform="rotate(7 32 32)">
+        <rect x="8" y="8" width="48" height="48" rx="13" fill="url(#logoGrad1)" stroke="#fff" stroke-width="4.5"/>
+        <text x="32" y="42" font-family="Arial, sans-serif" font-size="25" font-weight="900" text-anchor="middle" fill="#fff">B<tspan fill="#ffc400">K</tspan></text>
+      </g>
+    </svg>
+    <span class="logoWort">Ball<em>Knowledge</em></span>
+  </div>
+  <div></div>
+</nav>
+
+<!-- Seitenmenü (links ausklappbar) -->
+<div id="sidebarBackdrop"></div>
+<aside id="sidebar">
+  <div class="sbHeader">
+    <svg class="logoBadge" viewBox="0 0 64 64" aria-hidden="true">
+      <defs><linearGradient id="logoGrad2" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#00c463"/><stop offset="1" stop-color="#007a3d"/>
+      </linearGradient></defs>
+      <g transform="rotate(7 32 32)">
+        <rect x="8" y="8" width="48" height="48" rx="13" fill="url(#logoGrad2)" stroke="#fff" stroke-width="4.5"/>
+        <text x="32" y="42" font-family="Arial, sans-serif" font-size="25" font-weight="900" text-anchor="middle" fill="#fff">B<tspan fill="#ffc400">K</tspan></text>
+      </g>
+    </svg>
+    <span class="sbTitle">Menü</span>
+    <button id="btnSidebarClose" aria-label="Menü schließen" title="Schließen">✕</button>
+  </div>
+  <nav class="sbNav">
+    <button class="sbLink" id="sbHome">🏠 <span>Startseite</span></button>
+    <div class="sbSection">Spiele</div>
+    <button class="sbLink" id="sbHoeher">📊 <span>Höher oder Niedriger</span></button>
+    <button class="sbLink" id="sbTtt">#️⃣ <span>Fußball Tic-Tac-Toe</span></button>
+    <button class="sbLink" id="sbKarriere">🕵️ <span>Karriere-Raten</span></button>
+    <div class="sbSection">Ansicht</div>
+    <button class="sbLink" id="btnTheme">☀️ <span>Heller Modus</span></button>
+    <div class="sbSection">Mehr</div>
+    <button class="sbLink" id="sbTeilen">🔗 <span>Ball-Knowledge teilen</span></button>
+    <button class="sbLink" disabled>⚙ <span>Einstellungen · bald</span></button>
+  </nav>
+</aside>
+
+<header>
+  <h1 id="headerTitel">Wie gut ist dein Fußballwissen?</h1>
+  <p id="headerUntertitel">Wähle ein Spiel und leg los.</p>
+</header>
+
+<!-- Startseite: Spielauswahl -->
+<section id="homeScreen">
+  <div class="gameCards">
+    <div class="gameCard" id="cardHoeher">
+      <div class="gcPreview gpHoeher">
+        <div class="gpCard"><span class="gpNum">480</span></div>
+        <div class="gpVs">VS</div>
+        <div class="gpCard gpCardQ">
+          <span class="gpNum">?</span>
+          <div class="gpArrows"><span class="up">▲</span><span class="down">▼</span></div>
+        </div>
+      </div>
+      <div class="gcTitle">Höher oder Niedriger</div>
+      <div class="gcDesc">Zwei Fußballer, eine Statistik – liegt der nächste höher oder niedriger? Wie lang wird dein Streak?</div>
+      <div class="gcCta">Spielen</div>
+    </div>
+    <div class="gameCard" id="cardTtt">
+      <div class="gcPreview gpTtt">
+        <div class="gpGrid">
+          <span class="x">✕</span><span></span><span class="o">◯</span>
+          <span></span><span class="x">✕</span><span></span>
+          <span class="o">◯</span><span></span><span class="x">✕</span>
+        </div>
+      </div>
+      <div class="gcTitle">Fußball Tic-Tac-Toe</div>
+      <div class="gcDesc">Zwei Spieler, ein Raster: Nenne einen Fußballer, der zu beiden Kriterien passt – wer holt drei in einer Reihe?</div>
+      <div class="gcCta">Spielen</div>
+    </div>
+    <div class="gameCard" id="cardKarriere">
+      <div class="gcPreview gpKarriere">
+        <div class="gpTl">
+          <div class="gpBar"><span class="d"></span></div>
+          <div class="gpBar"><span class="d"></span></div>
+          <div class="gpBar q">?</div>
+        </div>
+      </div>
+      <div class="gcTitle">Karriere-Raten</div>
+      <div class="gcDesc">Errate den Spieler an seinen Karriere-Stationen – je früher, desto mehr Punkte. Solo spielbar!</div>
+      <div class="gcCta">Spielen</div>
+    </div>
+    <!-- Fußball-Bombe vorerst ausgeblendet (Code bleibt vollständig erhalten,
+         nur die Startseiten-Kachel ist versteckt). Zum Reaktivieren: style entfernen. -->
+    <div class="gameCard" id="cardBombe" style="display:none">
+      <div class="gcIcon">💣</div>
+      <div class="gcTitle">Fußball-Bombe</div>
+      <div class="gcDesc">Nennt reihum Spieler, die zur Kategorie passen – bei wem die Bombe platzt, der fliegt raus!</div>
+    </div>
+    <!-- „Bald verfügbar"-Kachel entfernt (2026-07-24, Daniel): nur die 3 echten
+         Spiele sollen angezeigt werden. Zum Reaktivieren einfach auskommentieren.
+    <div class="gameCard bald">
+      <div class="gcIcon">🔜</div>
+      <div class="gcTitle">Bald verfügbar</div>
+      <div class="gcDesc">Hier erscheint das nächste Spiel – Ideen sind schon in Arbeit!</div>
+    </div>
+    -->
+
+  </div>
+
+  <!-- Info-Bereich: echter Textinhalt (Über / Regeln / Daten / FAQ). Wichtig
+       u. a. für Suchmaschinen und die AdSense-Prüfung (reine Spiele-Seiten
+       ohne Text gelten dort als „zu wenig Inhalt"). -->
+  <div class="infoBereich">
+    <h2>Was ist Ball-Knowledge?</h2>
+    <p><strong>Ball-Knowledge</strong> ist eine kostenlose Sammlung von
+      Fußball-Ratespielen für Handy und Desktop. Ob allein oder zu zweit vor
+      einem Bildschirm: Hier testest du dein Wissen über Spieler, Vereine,
+      Ligen und Karrieren – von den Weltstars bis zu den Geheimtipps der
+      Bundesliga. Keine Anmeldung, kein Download: Seite öffnen, Spiel wählen,
+      losraten.</p>
+    <p>Hinter den Spielen steckt eine Datenbank mit über <strong>2.500
+      Profis</strong> aus den großen europäischen Ligen – mit
+      Karrierestationen, Nationalmannschaften, Titeln und Statistiken. Jede
+      Runde wird daraus neu zusammengestellt: Du kannst beliebig oft spielen,
+      ohne dass sich die Fragen wiederholen. Drei Schwierigkeitsgrade sorgen
+      dafür, dass Gelegenheitsgucker genauso auf ihre Kosten kommen wie
+      echte Kenner.</p>
+
+    <h2>So funktionieren die Spiele</h2>
+    <div class="infoKarte">
+      <h3>📊 Höher oder Niedriger</h3>
+      <p>Du siehst zwei Fußballer und eine Statistik – zum Beispiel Tore,
+        Länderspiele, Marktwert oder das EA-FC-Rating. Der Wert des linken
+        Spielers ist aufgedeckt, beim rechten schätzt du: Liegt er
+        <strong>höher oder niedriger</strong>? Jede richtige Antwort
+        verlängert deinen Streak, ein Fehler beendet den Lauf. Vor der Runde
+        wählst du Schwierigkeitsgrad und Kategorien selbst.</p>
+      <p>Tipp: Mit mehreren Kategorien bleibt es spannend – die Kategorie
+        wechselt dann in jeder Runde zufällig.</p>
+    </div>
+    <div class="infoKarte">
+      <h3>❌ Fußball Tic-Tac-Toe</h3>
+      <p>Das klassische 3×3-Raster, aber mit Fußballwissen: Jede Zeile und
+        Spalte steht für ein Kriterium – Vereine, Nationen, Ligen, Pokale
+        oder Liga-Titel. Ihr spielt zu zweit an einem Gerät und wählt
+        abwechselnd ein Feld. Wer dran ist, nennt einen Spieler, der zu
+        <strong>beiden</strong> Kriterien des Feldes passt. Falsche Antwort =
+        Zug verloren. Wer zuerst drei Felder in einer Reihe holt, gewinnt.</p>
+      <p>Im Modus „Selbst wählen" stellt ihr die sechs Kriterien selbst
+        zusammen; die Seite prüft automatisch, ob das Raster lösbar ist. Bei
+        Sieg oder Aufgabe zeigt sie für alle offenen Felder eine mögliche
+        Lösung an.</p>
+    </div>
+    <div class="infoKarte">
+      <h3>🕵️ Karriere-Raten</h3>
+      <p>Errate den Profi an seiner Karriere: Die erste Vereinsstation ist
+        aufgedeckt, danach kommen nach und nach weitere Klubs, die
+        Nationalmannschaft und das Alter dazu. Je früher du den Spieler
+        errätst, desto mehr Punkte gibt es – <strong>8 für den Sofort-Treffer,
+        pro Hinweis einer weniger</strong>. Dein Punkterekord wird im Browser
+        gespeichert. Perfekt für unterwegs, weil du es allein spielen
+        kannst.</p>
+    </div>
+
+    <h2>Woher stammen die Daten?</h2>
+    <p>Die Kader- und Karrieredaten kommen aus <strong>Wikidata</strong> und
+      <strong>Wikipedia</strong>, die Spielstärke-Ratings aus
+      <strong>EA FC 26</strong>; Fotos und Vereinslogos werden live von
+      Wikipedia geladen. Alle Statistiken sind Richtwerte über die gesamte
+      Karriere (Verein + Nationalteam), Stand Juli 2026. Die Datenbank wird
+      laufend erweitert und korrigiert.</p>
+
+    <h2>Häufige Fragen</h2>
+    <details>
+      <summary>Kostet Ball-Knowledge etwas?</summary>
+      <p>Nein. Alle Spiele sind komplett kostenlos spielbar – ohne Anmeldung
+        und ohne App-Installation.</p>
+    </details>
+    <details>
+      <summary>Brauche ich ein Konto?</summary>
+      <p>Nein. Deine Rekorde (z. B. der beste Streak) werden nur lokal in
+        deinem Browser gespeichert und nirgendwo hochgeladen.</p>
+    </details>
+    <details>
+      <summary>Kann ich am Handy spielen?</summary>
+      <p>Ja – Ball-Knowledge ist zuerst fürs Handy gebaut und läuft im
+        Hochformat genauso gut wie am Desktop. Einfach im Browser öffnen.</p>
+    </details>
+    <details>
+      <summary>Warum finde ich einen bestimmten Spieler nicht?</summary>
+      <p>Die Datenbank umfasst die kuratierten Stars der Fußballgeschichte
+        sowie die Kader der Bundesliga und vieler europäischer Topklubs der
+        letzten Jahre. Ältere oder sehr unbekannte Spieler fehlen teilweise
+        noch – die Datenbank wächst mit jedem Update. Die Namenssuche
+        funktioniert übrigens auch ohne Sonderzeichen: „gundogan" findet
+        Gündoğan.</p>
+    </details>
+    <details>
+      <summary>Kommen neue Spiele dazu?</summary>
+      <p>Ja, weitere Spielideen sind in Arbeit. Es lohnt sich, immer mal
+        wieder vorbeizuschauen.</p>
+    </details>
+  </div>
+</section>
+
+<!-- Kategorien-Auswahl -->
+<section id="startScreen">
+  <h2>Schwierigkeitsgrad</h2>
+  <div class="chipGrid" id="stufeGrid">
+    <button class="chip stufeChip" data-stufe="1">⭐ Leicht – nur Weltstars</button>
+    <button class="chip stufeChip aktiv" data-stufe="2">⭐⭐ Mittel – bekannte Spieler</button>
+    <button class="chip stufeChip" data-stufe="3">⭐⭐⭐ Schwer – alle Spieler</button>
+  </div>
+  <h2>Wähle die Kategorien für diese Runde</h2>
+  <div class="chipGrid" id="chipGrid"></div>
+  <div class="startActions">
+    <button id="btnAlle">Alle an / aus</button>
+    <button class="catBtn" id="btnStart">Spiel starten</button>
+  </div>
+  <p style="color:var(--muted); max-width:460px; font-size:0.9rem;">
+    Sind mehrere Kategorien aktiv, wechselt die Kategorie in jeder Runde zufällig.
+    Hat der neue Spieler den gleichen Wert, zählt das als richtig.
+  </p>
+</section>
+
+<!-- Spielbereich -->
+<section id="gameScreen">
+  <div id="scoreBar">
+    <span class="badge">Streak <strong id="streak">0</strong></span>
+    <span id="categoryLabel">Tore</span>
+    <span class="badge rekord">Rekord <strong id="best">0</strong></span>
+  </div>
+
+  <div id="cards">
+    <div class="card" id="cardLeft">
+      <img class="photo" id="leftPhoto" alt="">
+      <div class="emoji" id="leftEmoji">🧑‍🦱</div>
+      <div class="name" id="leftName"></div>
+      <div class="meta" id="leftMeta"></div>
+      <div class="valueLabel" id="leftValueLabel"></div>
+      <div class="value" id="leftValue"></div>
+    </div>
+
+    <div id="vs"><span>VS</span></div>
+
+    <div class="card" id="cardRight">
+      <img class="photo" id="rightPhoto" alt="">
+      <div class="emoji" id="rightEmoji">🧑‍🦰</div>
+      <div class="name" id="rightName"></div>
+      <div class="meta" id="rightMeta"></div>
+      <div class="valueLabel" id="rightValueLabel"></div>
+      <div class="value" id="rightValue">?</div>
+      <div id="guessButtons">
+        <button class="guessBtn up" id="btnUp">▲ Höher</button>
+        <button class="guessBtn down" id="btnDown">▼ Niedriger</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="gameOver">
+    <h2>Vorbei!</h2>
+    <p class="finalScore" id="finalScore"></p>
+    <button class="catBtn" id="btnRestart">Nochmal spielen</button>
+    <button class="shareBtn" id="btnShare">🔗 Ergebnis teilen</button>
+  </div>
+</section>
+
+<!-- Fußball Tic-Tac-Toe -->
+<section id="tttScreen">
+
+  <!-- Einrichtung -->
+  <div id="tttSetup">
+    <h2>Schwierigkeit</h2>
+    <div class="chipGrid" id="tttStufeGrid">
+      <button class="chip tttStufeChip" data-stufe="1">⭐ Leicht – große Namen</button>
+      <button class="chip tttStufeChip aktiv" data-stufe="2">⭐⭐ Mittel</button>
+      <button class="chip tttStufeChip" data-stufe="3">⭐⭐⭐ Schwer – alle Klubs</button>
+    </div>
+    <h2>Kriterien-Arten</h2>
+    <div class="chipGrid" id="tttTypen">
+      <button class="chip aktiv" data-typ="verein" disabled title="Vereine sind immer dabei">⚽ Vereine</button>
+      <button class="chip aktiv" data-typ="land">🌍 Nationen</button>
+      <button class="chip aktiv" data-typ="liga">🏟️ Ligen</button>
+      <button class="chip aktiv" data-typ="pokal">🏆 Pokale</button>
+      <button class="chip aktiv" data-typ="ligasieger">🏅 Liga-Sieger</button>
+    </div>
+    <h2>Modus</h2>
+    <div class="chipGrid" id="tttModus">
+      <button class="chip modusChip aktiv" data-modus="zufall">🎲 Zufällig</button>
+      <button class="chip modusChip" data-modus="custom">✏️ Selbst wählen</button>
+    </div>
+    <div class="startActions">
+      <button class="catBtn" id="btnTttErstellen">Raster erstellen</button>
+    </div>
+    <p class="tttHinweis">
+      Zwei Spieler am Gerät, abwechselnd. Bei <strong>Zufällig</strong> wird ein
+      lösbares Raster ausgewürfelt; bei <strong>Selbst wählen</strong> bestimmst du
+      die Kriterien selbst. Die Schwierigkeit steuert, wie bekannt Vereine und
+      Nationen im Raster sind.
+    </p>
+  </div>
+
+  <!-- Selbst wählen -->
+  <div id="tttCustom">
+    <h2>Kriterien selbst wählen</h2>
+    <div class="tttCustomGrid">
+      <div class="tttCustomSpalte">
+        <div class="tttCustomTitel">↓ Zeilen</div>
+        <select class="tttSelect" data-slot="z0"></select>
+        <select class="tttSelect" data-slot="z1"></select>
+        <select class="tttSelect" data-slot="z2"></select>
+      </div>
+      <div class="tttCustomSpalte">
+        <div class="tttCustomTitel">→ Spalten</div>
+        <select class="tttSelect" data-slot="s0"></select>
+        <select class="tttSelect" data-slot="s1"></select>
+        <select class="tttSelect" data-slot="s2"></select>
+      </div>
+    </div>
+    <p class="tttWarnung" id="tttCustomWarnung"></p>
+    <div class="startActions">
+      <button id="btnTttCustomZurueck" class="sekBtn">← Zurück</button>
+      <button class="catBtn" id="btnTttCustomBauen">Raster bauen</button>
+    </div>
+  </div>
+
+  <!-- Spiel -->
+  <div id="tttSpiel">
+    <div id="tttStatus"><span id="tttTurn"></span></div>
+    <div id="tttGrid"></div>
+    <div class="tttActions">
+      <button id="btnTttEinstellungen" class="sekBtn">← Zurück</button>
+      <button id="btnTttAufgeben" class="sekBtn">🏳️ Aufgeben</button>
+      <button id="btnTttNeu" class="catBtn">Neues Raster</button>
+    </div>
+    <p class="tttHinweis" id="tttHinweis">
+      Klickt abwechselnd ein Feld an und nennt einen Spieler, der zu <strong>beiden</strong> Kriterien passt.
+      Falsche Antwort = Zug verloren. Jeder Spieler darf nur einmal verwendet werden.
+    </p>
+  </div>
+
+  <!-- Spieler-Auswahl (Overlay) -->
+  <div id="tttPicker">
+    <div class="pickerBox">
+      <div class="pickerKrit" id="pickerKrit"></div>
+      <input type="text" id="pickerInput" placeholder="Spielername eintippen …" autocomplete="off">
+      <div id="pickerListe"></div>
+      <button id="pickerAbbruch">Abbrechen</button>
+    </div>
+  </div>
+
+  <!-- Spielende (Overlay) -->
+  <div id="tttOver">
+    <div class="overBox">
+      <h2 id="tttOverText"></h2>
+      <button class="catBtn" id="btnTttNochmal">Nochmal spielen</button>
+    </div>
+  </div>
+</section>
+
+<!-- Fußball-Bombe -->
+<section id="bombeScreen">
+  <!-- Einstellungen -->
+  <div id="bombeSetup">
+    <h2>Wie viele Spieler seid ihr?</h2>
+    <div class="chipGrid" id="bombeAnzahl">
+      <button class="chip" data-n="2">2 Spieler</button>
+      <button class="chip aktiv" data-n="3">3 Spieler</button>
+      <button class="chip" data-n="4">4 Spieler</button>
+      <button class="chip" data-n="5">5 Spieler</button>
+      <button class="chip" data-n="6">6 Spieler</button>
+    </div>
+    <div class="startActions">
+      <button class="catBtn" id="btnBombeStart">Bombe scharf machen 💣</button>
+    </div>
+    <p class="tttHinweis">
+      Eine Kategorie erscheint, und ihr nennt <strong>reihum</strong> passende Spieler
+      (eintippen und auswählen). Die Bombe hat eine <strong>versteckte Zündschnur</strong> –
+      bei wem sie hochgeht, der scheidet aus. Wer als Letztes übrig ist, gewinnt!
+      Jeder Spieler zählt pro Runde nur einmal.
+    </p>
+  </div>
+
+  <!-- Laufendes Spiel -->
+  <div id="bombeSpiel" style="display:none">
+    <div id="bombeStatus"><span id="bombeEmoji">💣</span> <span id="bombeDran"></span></div>
+    <div class="bombeKat" id="bombeKat"></div>
+    <div class="bombeEingabe">
+      <input type="text" id="bombeInput" placeholder="Spielername eintippen …" autocomplete="off">
+      <div id="bombeListe"></div>
+    </div>
+    <div id="bombeBenutzt"></div>
+  </div>
+
+  <!-- Runden-/Spielende (Overlay) -->
+  <div id="bombeOver">
+    <div class="overBox">
+      <h2 id="bombeOverText"></h2>
+      <button class="catBtn" id="btnBombeWeiter">Nächste Runde</button>
+    </div>
+  </div>
+</section>
+
+<!-- Karriere-Raten -->
+<section id="karriereScreen">
+  <!-- Einrichtung -->
+  <div id="karriereSetup">
+    <h2>Schwierigkeit</h2>
+    <div class="chipGrid" id="karriereStufeGrid">
+      <button class="chip karStufeChip" data-stufe="1">⭐ Leicht – große Namen</button>
+      <button class="chip karStufeChip aktiv" data-stufe="2">⭐⭐ Mittel</button>
+      <button class="chip karStufeChip" data-stufe="3">⭐⭐⭐ Schwer – auch Kenner</button>
+    </div>
+    <div class="startActions">
+      <button class="catBtn" id="btnKarriereStart">Spiel starten</button>
+    </div>
+    <p class="tttHinweis">
+      Errate den Spieler an seinen Karriere-Stationen. Die erste Station ist
+      sichtbar – tippst du falsch oder klickst „Weiterer Hinweis", kommt die
+      nächste dazu. Je früher du ihn hast, desto mehr Punkte. Solo spielbar.
+    </p>
+  </div>
+
+  <!-- Spiel -->
+  <div id="karriereSpiel">
+    <div id="karScore">
+      <span class="badge" title="Punkte, die es für diesen Spieler noch gibt – pro Hinweis einer weniger">Zu holen <strong id="karRunde">8</strong></span>
+      <span class="badge">Punkte <strong id="karPunkte">0</strong></span>
+      <span class="badge rekord">Rekord <strong id="karBest">0</strong></span>
+    </div>
+    <div class="karFrage">Welcher Spieler ist das?</div>
+    <div id="karTimeline"></div>
+    <div>
+      <input type="text" id="karInput" placeholder="Spielername eintippen …" autocomplete="off">
+      <div id="karListe"></div>
+    </div>
+    <div class="tttActions">
+      <button id="btnKarEinstellungen" class="sekBtn">← Zurück</button>
+      <button id="btnKarAufloesen" class="sekBtn">🏳️ Auflösen</button>
+    </div>
+  </div>
+
+  <!-- Rundenende (Overlay) -->
+  <div id="karOver">
+    <div class="overBox">
+      <div id="karOverFoto"></div>
+      <h2 id="karOverText"></h2>
+      <p id="karOverPunkte" class="finalScore"></p>
+      <button class="catBtn" id="btnKarWeiter">Nächster Spieler</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Alle Statistiken: Stand Juli 2026, Richtwerte (gesamte Karriere, Verein + Nationalteam). Ratings: EA FC 26 (bei Karriereende: letztes bekanntes Rating). Fotos: Wikipedia. Kader: Wikidata. Liga-Sieger: aus den Meistervereinen abgeleitet (Richtwert).
+  <div class="footerLinks">
+    <button id="btnRecht" type="button">Impressum &amp; Datenschutz</button>
+  </div>
+</footer>
+
+<!-- Impressum & Datenschutz (Overlay) -->
+<div id="rechtOverlay" role="dialog" aria-modal="true" aria-labelledby="rechtTitel">
+  <div class="rechtPanel">
+    <button id="btnRechtZu" aria-label="Schließen" title="Schließen">✕</button>
+    <h2 id="rechtTitel">Impressum</h2>
+    <p>Angaben gemäß § 5 DDG:</p>
+    <p>
+      [VOLLSTÄNDIGER NAME]<br>
+      [STRASSE HAUSNUMMER]<br>
+      [PLZ ORT]<br>
+      E-Mail: [E-MAIL-ADRESSE]
+    </p>
+
+    <h2>Datenschutzerklärung</h2>
+    <h3>1. Allgemeines</h3>
+    <p>Ball-Knowledge ist ein privates, nicht-kommerzielles Projekt. Die Seite
+      verwendet <strong>keine Cookies</strong>, kein Tracking, keine Analyse-
+      Dienste und zeigt keine Werbung. Es gibt keine Registrierung; es werden
+      keine personenbezogenen Daten an uns übermittelt.</p>
+    <h3>2. Hosting</h3>
+    <p>Die Seite wird über GitHub Pages (GitHub, Inc., USA) ausgeliefert.
+      GitHub verarbeitet dabei technisch notwendige Verbindungsdaten (z. B.
+      die IP-Adresse) in Server-Logs. Details in der
+      Datenschutzerklärung von GitHub.</p>
+    <h3>3. Lokale Speicherung</h3>
+    <p>Spielstände und Rekorde werden ausschließlich lokal in deinem Browser
+      gespeichert (localStorage) und verlassen dein Gerät nicht. Sie lassen
+      sich jederzeit über das Löschen der Browserdaten entfernen.</p>
+    <h3>4. Eingebundene Inhalte Dritter</h3>
+    <p>Spieler- und Trophäenfotos werden live von Wikipedia/Wikimedia geladen,
+      Schriftarten von Google Fonts. Beim Laden dieser Inhalte wird deine
+      IP-Adresse technisch bedingt an die jeweiligen Anbieter übertragen.</p>
+    <h3>5. Deine Rechte</h3>
+    <p>Da diese Seite selbst keine personenbezogenen Daten speichert, gibt es
+      bei uns in der Regel nichts zu beauskunften oder zu löschen. Bei Fragen
+      erreichst du uns unter der oben genannten E-Mail-Adresse.</p>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="spieler.js?v=5"></script>
+<script src="spieler-bundesliga.js?v=3"></script>
+<script>
+// Normalisiert Namen für die Suche: Akzente/Sonderzeichen -> einfache Buchstaben,
+// damit man z. B. "kante" -> "Kanté", "gundogan" -> "Gündoğan",
+// "morata" -> "Álvaro Morata", "odegaard" -> "Ødegaard" findet.
+function normText(str) {
+  return str.toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")  // Akzente/Diakritika weg
+    .replace(/ø/g, "o").replace(/ł/g, "l").replace(/đ/g, "d").replace(/ð/g, "d")
+    .replace(/ß/g, "ss").replace(/æ/g, "ae").replace(/œ/g, "oe")
+    .replace(/ı/g, "i").replace(/þ/g, "th")
+    .replace(/['’`´]/g, "")     // Apostrophe entfernen (N'Golo -> ngolo)
+    .replace(/[-.]/g, " ")      // Bindestriche/Punkte -> Leerzeichen
+    .replace(/\s+/g, " ").trim();
+}
+
+// Bundesliga-Import (Wikidata) mit der Hauptdatenbank zusammenführen –
+// dabei Dubletten überspringen (normalisiert, fängt auch Apostroph-/Akzent-Varianten).
+(() => {
+  const vorhanden = new Set(SPIELER.map(s => normText(s.name)));
+  BUNDESLIGA_SPIELER.forEach(s => {
+    const key = normText(s.name);
+    if (!vorhanden.has(key)) { SPIELER.push(s); vorhanden.add(key); }
+  });
+})();
+
+// ---------- Ligen aus den Vereinsstationen ableiten ----------
+// Nur Vereine, bei denen unsere Spieler wirklich in der 1. Liga gespielt haben
+const LIGA_KLUBS = {
+  "Bundesliga": ["FC Bayern","Borussia Dortmund","RB Leipzig","Bayer Leverkusen","VfB Stuttgart","Werder Bremen","Borussia Mönchengladbach","Eintracht Frankfurt","VfL Wolfsburg","SC Freiburg","TSG Hoffenheim","FC Augsburg","1. FC Köln","Union Berlin","Heidenheim","Hannover 96","Hamburger SV","Schalke 04","1. FC Nürnberg","Bochum","FC Ingolstadt","Hertha BSC","Kaiserslautern","Mainz 05","Arminia Bielefeld","Greuther Fürth","Darmstadt 98","St. Pauli","Holstein Kiel"],
+  "Premier League": ["Man City","Man United","Liverpool","Arsenal","Chelsea","Tottenham","Newcastle","Aston Villa","West Ham","Everton","Brighton","Crystal Palace","Bournemouth","Brentford","Leicester","Southampton","Burnley","Fulham","Stoke","Sunderland","Leeds","Watford"],
+  "La Liga": ["Real Madrid","FC Barcelona","Atlético Madrid","Sevilla","Real Sociedad","Athletic Bilbao","Villarreal","Celta Vigo","Espanyol","Mallorca","Getafe","Las Palmas","Valencia","Betis"],
+  "Serie A": ["Juventus","AC Milan","Inter Mailand","Napoli","AS Rom","Lazio","Atalanta","Fiorentina","Cagliari","Torino","Bologna","Udinese","Sampdoria","Brescia","Palermo","Como"],
+  "Ligue 1": ["PSG","Monaco","Lyon","Lille","Rennes","Lens","Nantes","Bordeaux","Amiens","Marseille","Montpellier","Caen","Reims"],
+  "Eredivisie": ["Ajax","PSV","Feyenoord","Groningen","Heerenveen","Vitesse","AZ Alkmaar"],
+  "MLS": ["Inter Miami","LA Galaxy","LAFC","Vancouver","DC United","Chicago","NYC","Orlando","Montreal","NY Red Bulls"]
+};
+
+// Vereinsfarben [Farbe1, Farbe2] — Ersatz für die Wappen im Launch-Modus
+// (ZEIGE_WAPPEN = false): Kriterien-Kacheln im TTT und Punkte in der
+// Karriere-Timeline zeigen die Klubfarben statt des Logos. Vereine ohne
+// Eintrag behalten die neutrale Darstellung (⚽ + Name).
+const VEREINSFARBEN = {
+  // Bundesliga
+  "FC Bayern": ["#dc052d","#ffffff"], "Borussia Dortmund": ["#fde100","#000000"],
+  "RB Leipzig": ["#dd0741","#ffffff"], "Bayer Leverkusen": ["#e32221","#000000"],
+  "VfB Stuttgart": ["#ffffff","#e32219"], "Werder Bremen": ["#1d9053","#ffffff"],
+  "Borussia Mönchengladbach": ["#ffffff","#18a94d"], "Eintracht Frankfurt": ["#e1000f","#000000"],
+  "VfL Wolfsburg": ["#65b32e","#ffffff"], "SC Freiburg": ["#e2001a","#ffffff"],
+  "TSG Hoffenheim": ["#1961b5","#ffffff"], "FC Augsburg": ["#d3121a","#1c8038"],
+  "1. FC Köln": ["#ed1c24","#ffffff"], "Union Berlin": ["#eb1923","#ffd700"],
+  "Heidenheim": ["#e30613","#144a95"], "Hannover 96": ["#d31118","#000000"],
+  "Hamburger SV": ["#0a3f86","#ffffff"], "Schalke 04": ["#004d9d","#ffffff"],
+  "1. FC Nürnberg": ["#ad1732","#000000"], "Bochum": ["#005ca9","#ffffff"],
+  "FC Ingolstadt": ["#d71920","#000000"], "Hertha BSC": ["#005ca9","#ffffff"],
+  "Kaiserslautern": ["#e30613","#ffffff"], "Mainz 05": ["#c3141e","#ffffff"],
+  "Arminia Bielefeld": ["#004e95","#ffffff"], "Greuther Fürth": ["#009932","#ffffff"],
+  "Darmstadt 98": ["#004e9e","#ffffff"], "St. Pauli": ["#624736","#ffffff"],
+  "Holstein Kiel": ["#045ba5","#ffffff"],
+  // Premier League
+  "Man City": ["#6cabdd","#ffffff"], "Man United": ["#da291c","#000000"],
+  "Liverpool": ["#c8102e","#ffffff"], "Arsenal": ["#ef0107","#ffffff"],
+  "Chelsea": ["#034694","#ffffff"], "Tottenham": ["#ffffff","#132257"],
+  "Newcastle": ["#241f20","#ffffff"], "Aston Villa": ["#670e36","#95bfe5"],
+  "West Ham": ["#7a263a","#1bb1e7"], "Everton": ["#003399","#ffffff"],
+  "Brighton": ["#0057b8","#ffffff"], "Crystal Palace": ["#1b458f","#c4122e"],
+  "Bournemouth": ["#da291c","#000000"], "Brentford": ["#e30613","#ffffff"],
+  "Leicester": ["#003090","#ffffff"], "Southampton": ["#d71920","#ffffff"],
+  "Burnley": ["#6c1d45","#99d6ea"], "Fulham": ["#ffffff","#000000"],
+  "Stoke": ["#e03a3e","#ffffff"], "Sunderland": ["#eb172b","#ffffff"],
+  "Leeds": ["#ffffff","#1d428a"], "Watford": ["#fbee23","#ed2127"],
+  // La Liga
+  "Real Madrid": ["#ffffff","#febe10"], "FC Barcelona": ["#004d98","#a50044"],
+  "Atlético Madrid": ["#d6001c","#ffffff"], "Sevilla": ["#ffffff","#d8091f"],
+  "Real Sociedad": ["#0067b1","#ffffff"], "Athletic Bilbao": ["#ee2523","#ffffff"],
+  "Villarreal": ["#ffe667","#005187"], "Celta Vigo": ["#8ac3ee","#ffffff"],
+  "Espanyol": ["#007fc8","#ffffff"], "Mallorca": ["#e20613","#000000"],
+  "Getafe": ["#005999","#ffffff"], "Las Palmas": ["#ffe400","#004b9d"],
+  "Valencia": ["#ffffff","#ee3524"], "Betis": ["#00954c","#ffffff"],
+  // Serie A
+  "Juventus": ["#ffffff","#000000"], "AC Milan": ["#fb090b","#000000"],
+  "Inter Mailand": ["#0068a8","#000000"], "Napoli": ["#199fd6","#ffffff"],
+  "AS Rom": ["#8e1f2f","#f0bc42"], "Lazio": ["#87d8f7","#ffffff"],
+  "Atalanta": ["#1e71b8","#000000"], "Fiorentina": ["#61328c","#ffffff"],
+  "Cagliari": ["#b01028","#002350"], "Torino": ["#881f19","#ffffff"],
+  "Bologna": ["#a21c26","#1a2f48"], "Udinese": ["#000000","#ffffff"],
+  "Sampdoria": ["#0e50a0","#ffffff"], "Brescia": ["#01509e","#ffffff"],
+  "Palermo": ["#f8a8c0","#000000"], "Como": ["#003da5","#ffffff"],
+  // Ligue 1
+  "PSG": ["#004170","#da291c"], "Monaco": ["#e51b22","#ffffff"],
+  "Lyon": ["#ffffff","#da001a"], "Lille": ["#d40028","#0e1b3d"],
+  "Rennes": ["#e13327","#000000"], "Lens": ["#ec1c24","#fff200"],
+  "Nantes": ["#fcd405","#008d36"], "Bordeaux": ["#001b50","#ffffff"],
+  "Amiens": ["#5b6770","#ffffff"], "Marseille": ["#ffffff","#009add"],
+  "Montpellier": ["#0e2f6e","#f6871f"], "Caen": ["#003a70","#d20a11"],
+  "Reims": ["#ee2223","#ffffff"],
+  // Eredivisie
+  "Ajax": ["#ffffff","#d2122e"], "PSV": ["#ec1c24","#ffffff"],
+  "Feyenoord": ["#d8001d","#ffffff"], "Groningen": ["#009037","#ffffff"],
+  "Heerenveen": ["#0055a3","#ffffff"], "Vitesse": ["#ffe200","#000000"],
+  "AZ Alkmaar": ["#d2122e","#ffffff"],
+  // MLS
+  "Inter Miami": ["#f7b5cd","#000000"], "LA Galaxy": ["#00245d","#ffd200"],
+  "LAFC": ["#000000","#c39e6d"], "Vancouver": ["#04265c","#94c2e4"],
+  "DC United": ["#000000","#ee1b39"], "Chicago": ["#ff0000","#141946"],
+  "NYC": ["#6cace4","#041e42"], "Orlando": ["#633492","#fde192"],
+  "Montreal": ["#000000","#0033a1"], "NY Red Bulls": ["#ed1e36","#23326a"],
+  // Weitere bekannte Klubs aus der Datenbank
+  "RB Salzburg": ["#d20515","#ffffff"], "Genk": ["#003da5","#ffffff"],
+  "Benfica": ["#e83030","#ffffff"], "Porto": ["#003893","#ffffff"],
+  "Sporting": ["#008457","#ffffff"], "Celtic": ["#018749","#ffffff"],
+  "Rangers": ["#1b458f","#ffffff"], "Galatasaray": ["#a90432","#fdb912"],
+  "Fenerbahçe": ["#ffed00","#00235d"], "Beşiktaş": ["#000000","#ffffff"],
+  "Club Brügge": ["#0057b7","#000000"], "Al-Nassr": ["#ffe600","#01357e"],
+  "Al-Hilal": ["#1651a5","#ffffff"]
+};
+
+// Nationalfarben (zwei dominante Flaggenfarben) für die Nationen-Kriterien
+const NATIONALFARBEN = {
+  "Deutschland": ["#000000","#ffcc00"], "England": ["#ffffff","#ce1124"],
+  "Frankreich": ["#0055a4","#ef4135"], "Spanien": ["#aa151b","#f1bf00"],
+  "Brasilien": ["#009c3b","#ffdf00"], "Portugal": ["#006600","#ff0000"],
+  "Niederlande": ["#ae1c28","#21468b"], "Argentinien": ["#74acdf","#ffffff"],
+  "Italien": ["#009246","#ce2b37"], "Kroatien": ["#ff0000","#171796"],
+  "Belgien": ["#000000","#fdda24"], "Uruguay": ["#ffffff","#0038a8"],
+  "Polen": ["#ffffff","#dc143c"], "Norwegen": ["#ba0c2f","#00205b"],
+  "Schweden": ["#006aa7","#fecc02"], "Schweiz": ["#d52b1e","#ffffff"],
+  "Österreich": ["#ed2939","#ffffff"], "Dänemark": ["#c8102e","#ffffff"],
+  "Ungarn": ["#ce2939","#477050"], "Serbien": ["#c6363c","#0c4076"],
+  "Slowenien": ["#ffffff","#005da4"], "Bosnien": ["#002f6c","#fecb00"],
+  "Tschechien": ["#d7141a","#11457e"], "Türkei": ["#e30a17","#ffffff"],
+  "Ukraine": ["#005bbb","#ffd500"], "Schottland": ["#005eb8","#ffffff"],
+  "Wales": ["#c8102e","#00b140"], "Georgien": ["#ffffff","#ff0000"],
+  "Ägypten": ["#ce1126","#000000"], "Marokko": ["#c1272d","#006233"],
+  "Algerien": ["#006233","#ffffff"], "Senegal": ["#00853f","#fdef42"],
+  "Nigeria": ["#008751","#ffffff"], "Ghana": ["#ce1126","#fcd116"],
+  "Kamerun": ["#007a5e","#ce1126"], "Elfenbeinküste": ["#ff8200","#009a44"],
+  "Guinea": ["#ce1126","#009460"], "Gabun": ["#009e60","#3a75c4"],
+  "Südkorea": ["#ffffff","#cd2e3a"], "Japan": ["#ffffff","#bc002d"],
+  "USA": ["#b22234","#3c3b6e"], "Kanada": ["#ff0000","#ffffff"],
+  "Kolumbien": ["#fcd116","#003893"], "Chile": ["#d52b1e","#0039a6"],
+  "Ecuador": ["#ffdd00","#034ea2"], "Jamaika": ["#009b3a","#fed100"]
+};
+
+// Liga-Farben (Marken-Farbwelt) für Liga- und Liga-Sieger-Kriterien
+const LIGAFARBEN = {
+  "Bundesliga": ["#d20515","#ffffff"], "Premier League": ["#38003c","#ffffff"],
+  "La Liga": ["#d20a11","#ffffff"], "Serie A": ["#024494","#ffffff"],
+  "Ligue 1": ["#091c3e","#ffd700"], "Eredivisie": ["#0b2265","#ffffff"],
+  "MLS": ["#001f5b","#d50032"]
+};
+
+// Vereins-Kürzel im TV-Ticker-Stil (Badge-Text). Vereine ohne Eintrag
+// bekommen automatisch die ersten 3 Buchstaben.
+const VEREINS_KUERZEL = {
+  "FC Bayern": "FCB", "Borussia Dortmund": "BVB", "RB Leipzig": "RBL",
+  "Bayer Leverkusen": "B04", "VfB Stuttgart": "VFB", "Werder Bremen": "SVW",
+  "Borussia Mönchengladbach": "BMG", "Eintracht Frankfurt": "SGE",
+  "VfL Wolfsburg": "WOB", "SC Freiburg": "SCF", "TSG Hoffenheim": "TSG",
+  "FC Augsburg": "FCA", "1. FC Köln": "KOE", "Union Berlin": "FCU",
+  "Heidenheim": "FCH", "Hannover 96": "H96", "Hamburger SV": "HSV",
+  "Schalke 04": "S04", "1. FC Nürnberg": "FCN", "Bochum": "BOC",
+  "FC Ingolstadt": "FCI", "Hertha BSC": "BSC", "Kaiserslautern": "FCK",
+  "Mainz 05": "M05", "Arminia Bielefeld": "DSC", "Greuther Fürth": "SGF",
+  "Darmstadt 98": "D98", "St. Pauli": "STP", "Holstein Kiel": "KSV",
+  "Man City": "MCI", "Man United": "MUN", "Liverpool": "LIV", "Arsenal": "ARS",
+  "Chelsea": "CHE", "Tottenham": "TOT", "Newcastle": "NEW", "Aston Villa": "AVL",
+  "West Ham": "WHU", "Everton": "EVE", "Brighton": "BHA", "Crystal Palace": "CRY",
+  "Bournemouth": "BOU", "Brentford": "BRE", "Leicester": "LEI",
+  "Southampton": "SOU", "Burnley": "BUR", "Fulham": "FUL", "Stoke": "STK",
+  "Sunderland": "SUN", "Leeds": "LEE", "Watford": "WAT",
+  "Real Madrid": "RMA", "FC Barcelona": "BAR", "Atlético Madrid": "ATM",
+  "Sevilla": "SEV", "Real Sociedad": "RSO", "Athletic Bilbao": "ATH",
+  "Villarreal": "VIL", "Celta Vigo": "CEL", "Espanyol": "ESP",
+  "Mallorca": "MLL", "Getafe": "GET", "Las Palmas": "LPA", "Valencia": "VAL",
+  "Betis": "BET",
+  "Juventus": "JUV", "AC Milan": "ACM", "Inter Mailand": "INT", "Napoli": "NAP",
+  "AS Rom": "ROM", "Lazio": "LAZ", "Atalanta": "ATA", "Fiorentina": "FIO",
+  "Cagliari": "CAG", "Torino": "TOR", "Bologna": "BOL", "Udinese": "UDI",
+  "Sampdoria": "SAM", "Brescia": "BSA", "Como": "COM",
+  "PSG": "PSG", "Monaco": "ASM", "Lyon": "OL", "Lille": "LIL",
+  "Rennes": "REN", "Lens": "RCL", "Nantes": "NAN", "Bordeaux": "BOR",
+  "Amiens": "AMI", "Marseille": "OM", "Montpellier": "MHS", "Caen": "SMC",
+  "Reims": "SDR",
+  "Ajax": "AJA", "PSV": "PSV", "Feyenoord": "FEY", "Groningen": "GRO",
+  "Heerenveen": "HEE", "Vitesse": "VIT", "AZ Alkmaar": "AZ",
+  "Inter Miami": "MIA", "LA Galaxy": "LAG", "LAFC": "LAFC", "Vancouver": "VAN",
+  "DC United": "DCU", "Chicago": "CHI", "NYC": "NYC", "Orlando": "ORL",
+  "Montreal": "MTL", "NY Red Bulls": "NYRB",
+  "RB Salzburg": "SAL", "Genk": "GNK", "Benfica": "SLB", "Porto": "FCP",
+  "Sporting": "SCP", "Celtic": "CLT", "Rangers": "RAN", "Galatasaray": "GAL",
+  "Fenerbahçe": "FEN", "Beşiktaş": "BJK", "Club Brügge": "BRU",
+  "Al-Nassr": "ALN", "Al-Hilal": "ALH"
+};
+
+// Vollständige Vereinsnamen für die Anzeige (Daniels Wunsch 2026-07-26:
+// Kürzel im Farbkasten, darunter der KOMPLETTE Name). Die kurzen Namen aus
+// der Datenbank bleiben Schlüssel; ohne Eintrag wird der kurze Name gezeigt.
+const VEREINS_VOLLNAME = {
+  "FC Bayern": "FC Bayern München", "Bayer Leverkusen": "Bayer 04 Leverkusen",
+  "Werder Bremen": "SV Werder Bremen", "TSG Hoffenheim": "TSG 1899 Hoffenheim",
+  "Union Berlin": "1. FC Union Berlin", "Heidenheim": "1. FC Heidenheim",
+  "Schalke 04": "FC Schalke 04", "Bochum": "VfL Bochum",
+  "FC Ingolstadt": "FC Ingolstadt 04", "Kaiserslautern": "1. FC Kaiserslautern",
+  "Mainz 05": "1. FSV Mainz 05", "Greuther Fürth": "SpVgg Greuther Fürth",
+  "Darmstadt 98": "SV Darmstadt 98", "St. Pauli": "FC St. Pauli",
+  "Man City": "Manchester City", "Man United": "Manchester United",
+  "Liverpool": "FC Liverpool", "Arsenal": "FC Arsenal", "Chelsea": "FC Chelsea",
+  "Tottenham": "Tottenham Hotspur", "Newcastle": "Newcastle United",
+  "West Ham": "West Ham United", "Everton": "FC Everton",
+  "Brighton": "Brighton & Hove Albion", "Bournemouth": "AFC Bournemouth",
+  "Brentford": "FC Brentford", "Leicester": "Leicester City",
+  "Southampton": "FC Southampton", "Burnley": "FC Burnley",
+  "Fulham": "FC Fulham", "Stoke": "Stoke City", "Sunderland": "AFC Sunderland",
+  "Leeds": "Leeds United", "Watford": "FC Watford",
+  "Sevilla": "FC Sevilla", "Villarreal": "FC Villarreal",
+  "Celta Vigo": "Celta de Vigo", "Espanyol": "Espanyol Barcelona",
+  "Mallorca": "RCD Mallorca", "Getafe": "FC Getafe",
+  "Las Palmas": "UD Las Palmas", "Valencia": "FC Valencia",
+  "Betis": "Real Betis Sevilla",
+  "Juventus": "Juventus Turin", "AC Milan": "AC Mailand",
+  "Napoli": "SSC Neapel", "Lazio": "Lazio Rom", "Atalanta": "Atalanta Bergamo",
+  "Fiorentina": "AC Florenz", "Cagliari": "Cagliari Calcio",
+  "Torino": "FC Turin", "Bologna": "FC Bologna", "Udinese": "Udinese Calcio",
+  "Sampdoria": "Sampdoria Genua", "Brescia": "Brescia Calcio",
+  "Como": "Como 1907",
+  "PSG": "Paris Saint-Germain", "Monaco": "AS Monaco",
+  "Lyon": "Olympique Lyon", "Lille": "OSC Lille", "Rennes": "Stade Rennes",
+  "Lens": "RC Lens", "Nantes": "FC Nantes", "Bordeaux": "Girondins Bordeaux",
+  "Amiens": "SC Amiens", "Marseille": "Olympique Marseille",
+  "Montpellier": "HSC Montpellier", "Caen": "SM Caen", "Reims": "Stade Reims",
+  "Ajax": "Ajax Amsterdam", "PSV": "PSV Eindhoven",
+  "Feyenoord": "Feyenoord Rotterdam", "Groningen": "FC Groningen",
+  "Heerenveen": "SC Heerenveen", "Vitesse": "Vitesse Arnheim",
+  "Inter Miami": "Inter Miami CF", "LAFC": "Los Angeles FC",
+  "Vancouver": "Vancouver Whitecaps", "DC United": "D.C. United",
+  "Chicago": "Chicago Fire", "NYC": "New York City FC",
+  "Orlando": "Orlando City", "Montreal": "CF Montréal",
+  "NY Red Bulls": "New York Red Bulls",
+  "RB Salzburg": "Red Bull Salzburg", "Genk": "KRC Genk",
+  "Benfica": "Benfica Lissabon", "Porto": "FC Porto",
+  "Sporting": "Sporting Lissabon", "Celtic": "Celtic Glasgow",
+  "Rangers": "Glasgow Rangers", "Galatasaray": "Galatasaray Istanbul",
+  "Fenerbahçe": "Fenerbahçe Istanbul", "Beşiktaş": "Beşiktaş Istanbul",
+  "Al-Nassr": "Al-Nassr FC"
+};
+function vereinVollname(name) { return VEREINS_VOLLNAME[name] || name; }
+
+// FIFA-Länder-Codes für die Nationen-Badges
+const NATIONAL_KUERZEL = {
+  "Deutschland": "GER", "England": "ENG", "Frankreich": "FRA", "Spanien": "ESP",
+  "Brasilien": "BRA", "Portugal": "POR", "Niederlande": "NED",
+  "Argentinien": "ARG", "Italien": "ITA", "Kroatien": "CRO", "Belgien": "BEL",
+  "Uruguay": "URU", "Polen": "POL", "Norwegen": "NOR", "Schweden": "SWE",
+  "Schweiz": "SUI", "Österreich": "AUT", "Dänemark": "DEN", "Ungarn": "HUN",
+  "Serbien": "SRB", "Slowenien": "SVN", "Bosnien": "BIH", "Tschechien": "CZE",
+  "Türkei": "TUR", "Ukraine": "UKR", "Schottland": "SCO", "Wales": "WAL",
+  "Georgien": "GEO", "Ägypten": "EGY", "Marokko": "MAR", "Algerien": "ALG",
+  "Senegal": "SEN", "Nigeria": "NGA", "Ghana": "GHA", "Kamerun": "CMR",
+  "Elfenbeinküste": "CIV", "Guinea": "GUI", "Gabun": "GAB", "Südkorea": "KOR",
+  "Japan": "JPN", "USA": "USA", "Kanada": "CAN", "Kolumbien": "COL",
+  "Chile": "CHI", "Ecuador": "ECU", "Jamaika": "JAM"
+};
+
+const LIGA_KUERZEL = {
+  "Bundesliga": "BL", "Premier League": "PL", "La Liga": "LL", "Serie A": "SA",
+  "Ligue 1": "L1", "Eredivisie": "ERE", "MLS": "MLS"
+};
+
+// Farben + Kürzel eines Kriteriums fürs Badge (null = kein Badge).
+// Kürzel-Badges tragen NUR noch Vereine (Daniel, 2026-07-26). Länder =
+// Flaggen-Emoji, Ligen = 🏟️, Liga-Sieger = 🏆, Pokale = Trophäen-Foto.
+function kritBadgeDaten(k) {
+  if (k.typ === "verein" && VEREINSFARBEN[k.wert])
+    return { farben: VEREINSFARBEN[k.wert],
+             kuerzel: VEREINS_KUERZEL[k.wert] || k.wert.slice(0, 3).toUpperCase() };
+  return null;
+}
+
+// Badge-Textfarbe: normalerweise Farbe 2; wenn beide Farben zu ähnlich hell
+// sind (z. B. Real Madrid weiß/gold), automatisch Schwarz/Weiß nach Kontrast.
+function hexHelligkeit(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  return (0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+}
+function badgeTextFarbe(f1, f2) {
+  if (Math.abs(hexHelligkeit(f1) - hexHelligkeit(f2)) < 0.3)
+    return hexHelligkeit(f1) > 0.5 ? "#0e1a2b" : "#ffffff";
+  return f2;
+}
+
+// Kleines Trikot-Icon, links/rechts in den zwei Vereinsfarben (Karriere-Raten)
+let trikotZaehler = 0;
+function trikotEl(farben) {
+  const wrap = el("span", "karTrikot", "");
+  const id = "trikotClip" + (++trikotZaehler);
+  const form = "M10 2 L14 0 h6 L24 2 l8 6 -4 5 -3-2 V30 H9 V11 l-3 2 -4-5 Z";
+  wrap.innerHTML =
+    `<svg viewBox="0 0 34 30" aria-hidden="true">` +
+    `<defs><clipPath id="${id}"><path d="${form}"/></clipPath></defs>` +
+    `<g clip-path="url(#${id})">` +
+    `<rect x="0" y="0" width="17" height="30" fill="${farben[0]}"/>` +
+    `<rect x="17" y="0" width="17" height="30" fill="${farben[1]}"/></g>` +
+    `<path d="${form}" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.4"/></svg>`;
+  return wrap;
+}
+// Meister der Top-5-Ligen (jüngere Ära). Wer bei einem dieser Klubs war, zählt
+// als "Liga-Sieger" – klub-basierter Richtwert (Titeljahr nicht spielergenau).
+const LIGA_MEISTER_KLUBS = {
+  "Bundesliga":     ["FC Bayern", "Bayer Leverkusen"],
+  "Premier League": ["Man City", "Liverpool", "Leicester"],
+  "La Liga":        ["Real Madrid", "FC Barcelona", "Atlético Madrid"],
+  "Serie A":        ["Juventus", "Inter Mailand", "AC Milan", "Napoli"],
+  "Ligue 1":        ["PSG", "Monaco", "Lille"]
+};
+SPIELER.forEach(s => {
+  s.ligen = Object.keys(LIGA_KLUBS).filter(liga =>
+    s.klubs.some(k => LIGA_KLUBS[liga].includes(k))
+  );
+  s.ligaSieger = Object.keys(LIGA_MEISTER_KLUBS).filter(liga =>
+    s.klubs.some(k => LIGA_MEISTER_KLUBS[liga].includes(k))
+  );
+  s._such = normText(s.name); // vorab normalisierter Suchname
+});
+const KATEGORIEN = {
+  tore:             { label: "⚽ Tore",             einheit: "Tore",                   format: w => w },
+  assists:          { label: "🎯 Assists",          einheit: "Assists",                format: w => w },
+  spiele:           { label: "👕 Spiele",           einheit: "Spiele",                 format: w => w },
+  laenderspiele:    { label: "🌍 Länderspiele",     einheit: "Länderspiele",           format: w => w },
+  laenderspieltore: { label: "🥅 Länderspiel-Tore", einheit: "Tore im Nationalteam",   format: w => w },
+  titel:            { label: "🏆 Titel",            einheit: "Titel",                  format: w => w },
+  cltore:           { label: "⭐ CL-Tore",          einheit: "Champions-League-Tore",  format: w => w },
+  alter:            { label: "🎂 Alter",            einheit: "Alter",                  format: w => w + " Jahre" },
+  groesse:          { label: "📏 Größe",            einheit: "Körpergröße",            format: w => w + " cm" },
+  vereine:          { label: "🔁 Vereine",          einheit: "Profi-Vereine",          format: w => w },
+  marktwert:        { label: "💰 Marktwert",        einheit: "Marktwert",              format: w => w + " Mio. €" },
+  abloese:          { label: "💸 Rekord-Ablöse",    einheit: "Höchste Ablösesumme",    format: w => w + " Mio. €" },
+  follower:         { label: "📱 Follower",         einheit: "Instagram-Follower",     format: w => w >= 1 ? w + " Mio." : Math.round(w * 1000) + " Tsd." },
+  rating:           { label: "🎮 EA-FC-26-Rating",  einheit: "EA-FC-26-Rating",        format: w => w },
+  gelbekarten:      { label: "🟨 Gelbe Karten",     einheit: "Gelbe Karten",           format: w => w }
+};
+
+// ---------- Bilder von Wikipedia (Spielerfotos, Logos, Pokale) ----------
+const fotoCache = new Map(); // wiki-Titel -> Bild-URL oder null
+
+async function wikiThumb(titel) {
+  if (fotoCache.has(titel)) return fotoCache.get(titel);
+  try {
+    const res = await fetch(
+      "https://de.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(titel)
+    );
+    let url = null;
+    if (res.ok) {
+      const data = await res.json();
+      url = data.thumbnail ? data.thumbnail.source : null;
+    }
+    if (!url) {
+      const resEn = await fetch(
+        "https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(titel)
+      );
+      if (resEn.ok) {
+        const dataEn = await resEn.json();
+        url = dataEn.thumbnail ? dataEn.thumbnail.source : null;
+      }
+    }
+    fotoCache.set(titel, url);
+    return url;
+  } catch {
+    fotoCache.set(titel, null);
+    return null;
+  }
+}
+
+function fotoUrl(spieler) {
+  return wikiThumb(spieler.wiki || spieler.name);
+}
+
+async function zeigeFoto(spieler, imgEl, emojiEl) {
+  imgEl.style.display = "none";
+  emojiEl.style.display = "block";
+  const erwartet = spieler.name;
+  const url = await fotoUrl(spieler);
+  // Falls inzwischen schon der nächste Spieler angezeigt wird: nichts tun
+  if (imgEl.dataset.spieler !== erwartet) return;
+  if (url) {
+    imgEl.onload = () => {
+      if (imgEl.dataset.spieler !== erwartet) return;
+      imgEl.style.display = "block";
+      emojiEl.style.display = "none";
+    };
+    imgEl.src = url;
+  }
+}
+
+// ---------- Zustand ----------
+let maxStufe = 2;          // Schwierigkeitsgrad: 1 = leicht, 2 = mittel, 3 = schwer
+let aktiveKats = new Set(["tore", "assists", "spiele"]); // vor dem Start ausgewählt
+let aktuelleKat = "tore";  // Kategorie der laufenden Runde
+let links, rechts;         // aktuelle Spieler
+let streak = 0;
+let best = Number(localStorage.getItem("fussball_best") || 0);
+let locked = false;
+
+// ---------- Elemente ----------
+const $ = id => document.getElementById(id);
+
+// Adresse der Seite zum Teilen (ohne Query/Hash; zeigt nach Veröffentlichung
+// automatisch auf die echte Domain).
+const SEITEN_URL = location.origin + location.pathname;
+
+// Vereins- und Liga-Logos anzeigen? Wappen/Liga-Logos sind markenrechtlich
+// geschützt — für den öffentlichen Launch bewusst AUS (Daniels Entscheidung,
+// 2026-07-26; siehe /betrieb/rechtliches/offene-fragen.md). Auf true stellen,
+// sobald die Markenfrage geklärt ist. Pokal-FOTOS (Trophäen) und
+// Spielerfotos sind davon nicht betroffen.
+const ZEIGE_WAPPEN = false;
+
+// Kurze Bestätigung unten einblenden (z. B. „Link kopiert").
+let toastTimer = null;
+function showToast(msg) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+// Ergebnis teilen: natives Teilen-Menü (Handy), sonst Link+Text in die
+// Zwischenablage. Erwartet den fertigen Teilen-Text.
+async function teileErgebnis(text) {
+  const daten = { title: "Ball-Knowledge", text, url: SEITEN_URL };
+  if (navigator.share) {
+    try { await navigator.share(daten); }
+    catch (e) { /* Nutzer hat abgebrochen – nichts tun */ }
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(`${text}\n${SEITEN_URL}`);
+    showToast("📋 Ergebnis kopiert – jetzt einfügen & teilen!");
+  } catch (e) {
+    showToast("Teilen wird von diesem Browser nicht unterstützt.");
+  }
+}
+
+// Impressum & Datenschutz auf/zu (Overlay; Klick auf den dunklen Rand schließt)
+$("btnRecht").addEventListener("click", () => $("rechtOverlay").classList.add("offen"));
+$("btnRechtZu").addEventListener("click", () => $("rechtOverlay").classList.remove("offen"));
+$("rechtOverlay").addEventListener("click", e => {
+  if (e.target === $("rechtOverlay")) $("rechtOverlay").classList.remove("offen");
+});
+
+const homeScreen = $("homeScreen"), startScreen = $("startScreen"), gameScreen = $("gameScreen");
+const cardLeft = $("cardLeft"), cardRight = $("cardRight");
+const gameOver = $("gameOver"), guessButtons = $("guessButtons");
+
+$("best").textContent = best;
+
+// ---------- Screen-Verwaltung ----------
+function zeigeScreen(name) {
+  homeScreen.style.display  = name === "home"  ? "flex"  : "none";
+  startScreen.style.display = name === "start" ? "flex"  : "none";
+  gameScreen.style.display  = name === "spiel" ? "block" : "none";
+  $("tttScreen").style.display = name === "ttt" ? "block" : "none";
+  $("bombeScreen").style.display = name === "bombe" ? "block" : "none";
+  $("karriereScreen").style.display = name === "karriere" ? "block" : "none";
+  $("btnHome").style.visibility = name === "home" ? "hidden" : "visible";
+  if (name !== "bombe") bombeStop();
+  if (name === "home") {
+    $("headerTitel").textContent = "Wie gut ist dein Fußballwissen?";
+    $("headerUntertitel").textContent = "Wähle ein Spiel und leg los.";
+  } else if (name === "ttt") {
+    $("headerTitel").textContent = "Fußball Tic-Tac-Toe";
+    $("headerUntertitel").textContent = "Zwei Spieler, ein Gerät – wer holt drei in einer Reihe?";
+  } else if (name === "bombe") {
+    $("headerTitel").textContent = "Fußball-Bombe";
+    $("headerUntertitel").textContent = "Nenne einen passenden Spieler, bevor die Bombe platzt!";
+  } else if (name === "karriere") {
+    $("headerTitel").textContent = "Karriere-Raten";
+    $("headerUntertitel").textContent = "Errate den Spieler an seinen Stationen.";
+  } else {
+    $("headerTitel").textContent = "Höher oder Niedriger";
+    $("headerUntertitel").textContent = "Wie lang wird dein Streak?";
+  }
+}
+
+// ---------- Seitenmenü ----------
+function sidebarOeffnen() { $("sidebar").classList.add("offen"); $("sidebarBackdrop").classList.add("offen"); }
+function sidebarSchliessen() { $("sidebar").classList.remove("offen"); $("sidebarBackdrop").classList.remove("offen"); }
+$("btnMenu").addEventListener("click", sidebarOeffnen);
+$("btnSidebarClose").addEventListener("click", sidebarSchliessen);
+$("sidebarBackdrop").addEventListener("click", sidebarSchliessen);
+
+// ---------- Hell/Dunkel-Umschalter (Standard: dunkel) ----------
+function themeLabel(theme) {
+  const b = $("btnTheme");
+  b.firstChild.nodeValue = theme === "dark" ? "☀️ " : "🌙 ";
+  b.querySelector("span").textContent = theme === "dark" ? "Heller Modus" : "Dunkler Modus";
+}
+function themeSetzen(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("bk_theme", theme);
+  themeLabel(theme);
+}
+themeSetzen(localStorage.getItem("bk_theme") || "dark");
+$("btnTheme").addEventListener("click", () =>
+  themeSetzen(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark"));
+
+// ---------- Navigation (Karten + Seitenmenü nutzen dieselben Funktionen) ----------
+function goHome()     { sidebarSchliessen(); zeigeScreen("home"); }
+function goHoeher()   { sidebarSchliessen(); zeigeScreen("start"); }
+function goTtt()      { sidebarSchliessen(); zeigeScreen("ttt"); tttSetupZeigen(); }
+function goKarriere() { sidebarSchliessen(); zeigeScreen("karriere"); karSetupZeigen(); }
+
+$("btnHome").addEventListener("click", goHome);
+$("logo").addEventListener("click", goHome);
+$("cardHoeher").addEventListener("click", goHoeher);
+$("cardTtt").addEventListener("click", goTtt);
+$("cardKarriere").addEventListener("click", goKarriere);
+$("sbKarriere").addEventListener("click", goKarriere);
+$("sbHome").addEventListener("click", goHome);
+$("sbHoeher").addEventListener("click", goHoeher);
+$("sbTtt").addEventListener("click", goTtt);
+$("sbTeilen").addEventListener("click", () => {
+  sidebarSchliessen();
+  teileErgebnis("⚽ Ball-Knowledge – wie gut ist dein Fußballwissen? Rate-Spiele rund um Fußball. Probier's aus!");
+});
+$("cardBombe").addEventListener("click", () => {
+  sidebarSchliessen();
+  zeigeScreen("bombe");
+  $("bombeSetup").style.display = "flex";
+  $("bombeSpiel").style.display = "none";
+  $("bombeOver").style.display = "none";
+});
+// Hinweis: der Start-Aufruf zeigeScreen("home") steht am Skriptende,
+// weil er bombeStop() nutzt und die Bombe-Variablen erst unten definiert werden.
+
+// Schwierigkeitsgrad-Auswahl
+document.querySelectorAll(".stufeChip").forEach(chip =>
+  chip.addEventListener("click", () => {
+    maxStufe = Number(chip.dataset.stufe);
+    document.querySelectorAll(".stufeChip").forEach(c =>
+      c.classList.toggle("aktiv", c === chip)
+    );
+  })
+);
+
+// Kategorie-Chips aufbauen
+const chipGrid = $("chipGrid");
+for (const [key, kat] of Object.entries(KATEGORIEN)) {
+  const chip = document.createElement("button");
+  chip.className = "chip" + (aktiveKats.has(key) ? " aktiv" : "");
+  chip.textContent = kat.label;
+  chip.dataset.kat = key;
+  chip.addEventListener("click", () => {
+    if (aktiveKats.has(key)) aktiveKats.delete(key);
+    else aktiveKats.add(key);
+    chip.classList.toggle("aktiv");
+    updateStartButton();
+  });
+  chipGrid.appendChild(chip);
+}
+
+function updateStartButton() {
+  const anzahl = aktiveKats.size;
+  $("btnStart").disabled = anzahl === 0;
+  $("btnStart").textContent = anzahl === 0
+    ? "Mindestens 1 Kategorie wählen"
+    : `Spiel starten (${anzahl} ${anzahl === 1 ? "Kategorie" : "Kategorien"})`;
+}
+updateStartButton();
+
+$("btnAlle").addEventListener("click", () => {
+  const alleAktiv = aktiveKats.size === Object.keys(KATEGORIEN).length;
+  aktiveKats = alleAktiv ? new Set() : new Set(Object.keys(KATEGORIEN));
+  document.querySelectorAll("#chipGrid .chip").forEach(c =>
+    c.classList.toggle("aktiv", !alleAktiv)
+  );
+  updateStartButton();
+});
+
+$("btnStart").addEventListener("click", startGame);
+$("btnUp").addEventListener("click", () => guess("up"));
+$("btnDown").addEventListener("click", () => guess("down"));
+$("btnRestart").addEventListener("click", () => {
+  gameOver.style.display = "none";
+  zeigeScreen("start");
+});
+
+$("btnShare").addEventListener("click", () => {
+  const text = streak === best && streak > 0
+    ? `⚽ Ball-Knowledge – Höher oder Niedriger: Neuer Rekord! Ich hab einen Streak von ${streak} geschafft. Schaffst du mehr?`
+    : `⚽ Ball-Knowledge – Höher oder Niedriger: Ich hab einen Streak von ${streak} geschafft (mein Rekord: ${best}). Schaffst du mehr?`;
+  teileErgebnis(text);
+});
+
+// ---------- Logik ----------
+function zufallsSpieler(ausser = []) {
+  const pool = SPIELER.filter(s => s.stufe <= maxStufe && !ausser.includes(s));
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function neueKategorie() {
+  const keys = [...aktiveKats];
+  aktuelleKat = keys[Math.floor(Math.random() * keys.length)];
+  $("categoryLabel").textContent = KATEGORIEN[aktuelleKat].label;
+}
+
+function startGame() {
+  if (aktiveKats.size === 0) return;
+  streak = 0;
+  $("streak").textContent = 0;
+  zeigeScreen("spiel");
+  gameOver.style.display = "none";
+  links = zufallsSpieler();
+  rechts = zufallsSpieler([links]);
+  neueKategorie();
+  render();
+}
+
+// Animation neu starten (Klasse entfernen, Reflow erzwingen, wieder hinzufügen)
+function animiere(el, klasse) {
+  el.classList.remove("slideIn", "swapIn");
+  void el.offsetWidth;
+  el.classList.add(klasse);
+}
+
+function render() {
+  const kat = KATEGORIEN[aktuelleKat];
+  $("leftPhoto").dataset.spieler = links.name;
+  $("rightPhoto").dataset.spieler = rechts.name;
+  zeigeFoto(links, $("leftPhoto"), $("leftEmoji"));
+  zeigeFoto(rechts, $("rightPhoto"), $("rightEmoji"));
+  $("leftName").textContent = links.name;
+  $("leftMeta").textContent = links.land;
+  $("leftValueLabel").textContent = kat.einheit;
+  $("leftValue").textContent = kat.format(links[aktuelleKat]);
+
+  $("rightName").textContent = rechts.name;
+  $("rightMeta").textContent = rechts.land;
+  $("rightValueLabel").textContent = kat.einheit;
+  $("rightValue").textContent = "?";
+
+  cardLeft.classList.remove("correct", "wrong");
+  cardRight.classList.remove("correct", "wrong");
+  animiere(cardLeft, "swapIn");
+  animiere(cardRight, "slideIn");
+  guessButtons.style.display = "flex";
+  setButtons(true);
+  locked = false;
+}
+
+function setButtons(enabled) {
+  $("btnUp").disabled = !enabled;
+  $("btnDown").disabled = !enabled;
+}
+
+function guess(richtung) {
+  if (locked) return;
+  locked = true;
+  setButtons(false);
+
+  const l = links[aktuelleKat], r = rechts[aktuelleKat];
+  // Gleichstand zählt immer als richtig
+  const richtig = r === l || (richtung === "up" ? r > l : r < l);
+
+  // Wert aufdecken (kleine Zähl-Animation)
+  animateValue($("rightValue"), r, KATEGORIEN[aktuelleKat].format, () => {
+    cardRight.classList.add(richtig ? "correct" : "wrong");
+
+    setTimeout(() => {
+      if (richtig) {
+        streak++;
+        $("streak").textContent = streak;
+        $("streak").classList.remove("pop");
+        void $("streak").offsetWidth;
+        $("streak").classList.add("pop");
+        if (streak > best) {
+          best = streak;
+          localStorage.setItem("fussball_best", best);
+          $("best").textContent = best;
+        }
+        // rechter Spieler wird neuer Referenzspieler
+        links = rechts;
+        rechts = zufallsSpieler([links]);
+        neueKategorie();
+        render();
+      } else {
+        guessButtons.style.display = "none";
+        $("finalScore").textContent =
+          `Dein Streak: ${streak} – Rekord: ${best}`;
+        gameOver.style.display = "flex";
+      }
+    }, 1100);
+  });
+}
+
+// ================== Fußball Tic-Tac-Toe ==================
+const ttt = {
+  zeilen: [], spalten: [],   // je 3 Kriterien
+  besitzer: [],              // 9 Felder: null | "rot" | "blau"
+  aktiv: "rot",
+  benutzte: new Set(),       // bereits verwendete Spielernamen
+  zelle: null,               // gerade angeklicktes Feld
+  vorbei: false
+};
+// "rot" = Spieler 1 (historischer Key, wird ORANGE dargestellt, damit Rot nicht
+// mit "falsch" verwechselt wird), "blau" = Spieler 2.
+const TTT_SPIELER_NAMEN = { rot: "✕ Spieler 1", blau: "◯ Spieler 2" };
+const POKAL_LABEL = { wm: "🏆 Weltmeister", cl: "🏆 CL-Sieger", em: "🏆 Europameister" };
+
+// Wikipedia-Artikel für Vereinslogos (Kriterien-Vereine)
+const KLUB_WIKI = {
+  "FC Bayern": "FC Bayern München", "Borussia Dortmund": "Borussia Dortmund",
+  "RB Leipzig": "RB Leipzig", "Bayer Leverkusen": "Bayer 04 Leverkusen",
+  "VfB Stuttgart": "VfB Stuttgart", "VfL Wolfsburg": "VfL Wolfsburg",
+  "Borussia Mönchengladbach": "Borussia Mönchengladbach", "TSG Hoffenheim": "TSG 1899 Hoffenheim",
+  "Real Madrid": "Real Madrid", "FC Barcelona": "FC Barcelona",
+  "Atlético Madrid": "Atlético Madrid", "Sevilla": "FC Sevilla",
+  "Real Sociedad": "Real Sociedad San Sebastián",
+  "Man City": "Manchester City", "Man United": "Manchester United",
+  "Liverpool": "FC Liverpool", "Arsenal": "FC Arsenal", "Chelsea": "FC Chelsea",
+  "Tottenham": "Tottenham Hotspur", "West Ham": "West Ham United",
+  "Everton": "FC Everton", "Leicester": "Leicester City",
+  "PSG": "Paris Saint-Germain", "Monaco": "AS Monaco",
+  "Juventus": "Juventus Turin", "AC Milan": "AC Mailand",
+  "Inter Mailand": "Inter Mailand", "Napoli": "SSC Neapel", "AS Rom": "AS Rom",
+  "Ajax": "Ajax Amsterdam", "PSV": "PSV Eindhoven",
+  "Benfica": "Benfica Lissabon", "Sporting": "Sporting Lissabon",
+  "Galatasaray": "Galatasaray Istanbul", "RB Salzburg": "FC Red Bull Salzburg",
+  "Marseille": "Olympique Marseille", "Lyon": "Olympique Lyon",
+  "Lille": "OSC Lille", "Rennes": "Stade Rennes",
+  "Villarreal": "FC Villarreal", "Valencia": "FC Valencia",
+  "Werder Bremen": "SV Werder Bremen", "Eintracht Frankfurt": "Eintracht Frankfurt",
+  "SC Freiburg": "SC Freiburg", "Schalke 04": "FC Schalke 04",
+  "Basel": "FC Basel", "Fiorentina": "AC Florenz",
+  "Aston Villa": "Aston Villa", "Brighton": "Brighton & Hove Albion",
+  "Newcastle": "Newcastle United", "Crystal Palace": "Crystal Palace",
+  "Fenerbahce": "Fenerbahçe Istanbul",
+  "Mainz 05": "1. FSV Mainz 05", "Bochum": "VfL Bochum",
+  "FC Augsburg": "FC Augsburg", "Union Berlin": "1. FC Union Berlin",
+  "Hertha BSC": "Hertha BSC", "Arminia Bielefeld": "Arminia Bielefeld",
+  "Greuther Fürth": "SpVgg Greuther Fürth", "Darmstadt 98": "SV Darmstadt 98",
+  "Heidenheim": "1. FC Heidenheim", "St. Pauli": "FC St. Pauli",
+  "Holstein Kiel": "Holstein Kiel", "Hamburger SV": "Hamburger SV",
+  "1. FC Köln": "1. FC Köln", "Kaiserslautern": "1. FC Kaiserslautern",
+  "Hannover 96": "Hannover 96", "1. FC Nürnberg": "1. FC Nürnberg",
+  "Porto": "FC Porto", "Feyenoord": "Feyenoord Rotterdam", "Celtic": "Celtic Glasgow",
+  "Athletic Bilbao": "Athletic Bilbao", "Celta Vigo": "Celta Vigo", "Betis": "Betis Sevilla",
+  "Lazio": "Lazio Rom", "Atalanta": "Atalanta Bergamo", "Bologna": "FC Bologna",
+  "Torino": "FC Turin", "Lens": "RC Lens", "Nantes": "FC Nantes",
+  "Fulham": "FC Fulham", "Bournemouth": "AFC Bournemouth", "Brentford": "FC Brentford"
+};
+
+// Wikipedia-Artikel für Liga-Logos und Pokal-Bilder
+const LIGA_WIKI = {
+  "Bundesliga": "Fußball-Bundesliga", "Premier League": "Premier League",
+  "La Liga": "La Liga", "Serie A": "Serie A", "Ligue 1": "Ligue 1",
+  "Eredivisie": "Eredivisie", "MLS": "Major League Soccer"
+};
+const POKAL_WIKI = {
+  wm: "FIFA-WM-Pokal",
+  // Trophäen-FOTO (Henkelpott), nicht der Liga-Artikel — dessen Thumbnail wäre
+  // das markenrechtlich heikle UEFA-Logo (en-Artikel; de existiert nicht)
+  cl: "European Champion Clubs' Cup",
+  em: "Henri-Delaunay-Pokal"
+};
+
+// Flaggen für die Nationen-Kriterien
+const FLAGGEN = {
+  "Deutschland": "🇩🇪", "England": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Frankreich": "🇫🇷", "Spanien": "🇪🇸",
+  "Brasilien": "🇧🇷", "Portugal": "🇵🇹", "Niederlande": "🇳🇱", "Argentinien": "🇦🇷",
+  "Italien": "🇮🇹", "Kroatien": "🇭🇷", "Belgien": "🇧🇪", "Uruguay": "🇺🇾",
+  "Polen": "🇵🇱", "Norwegen": "🇳🇴", "Schweden": "🇸🇪", "Schweiz": "🇨🇭",
+  "Österreich": "🇦🇹", "Dänemark": "🇩🇰", "Ungarn": "🇭🇺", "Serbien": "🇷🇸",
+  "Slowenien": "🇸🇮", "Bosnien": "🇧🇦", "Tschechien": "🇨🇿", "Türkei": "🇹🇷",
+  "Ukraine": "🇺🇦", "Schottland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "Wales": "🏴󠁧󠁢󠁷󠁬󠁳󠁿", "Georgien": "🇬🇪",
+  "Ägypten": "🇪🇬", "Marokko": "🇲🇦", "Algerien": "🇩🇿", "Senegal": "🇸🇳",
+  "Nigeria": "🇳🇬", "Ghana": "🇬🇭", "Kamerun": "🇨🇲", "Elfenbeinküste": "🇨🇮",
+  "Guinea": "🇬🇳", "Gabun": "🇬🇦", "Südkorea": "🇰🇷", "Japan": "🇯🇵",
+  "USA": "🇺🇸", "Kanada": "🇨🇦", "Kolumbien": "🇨🇴", "Chile": "🇨🇱",
+  "Ecuador": "🇪🇨", "Jamaika": "🇯🇲"
+};
+
+// Bild-Quelle für ein Kriterium (null = kein Bild, z. B. Nationen nutzen Flaggen-Emoji)
+function kritBildTitel(k) {
+  if (k.typ === "pokal")  return POKAL_WIKI[k.wert]; // Trophäen-Foto, kein Wappen
+  if (!ZEIGE_WAPPEN) return null; // Launch ohne Wappen/Liga-Logos → Emoji + Text
+  if (k.typ === "verein") return KLUB_WIKI[k.wert] || k.wert;
+  if (k.typ === "liga")   return LIGA_WIKI[k.wert];
+  if (k.typ === "ligasieger") return LIGA_WIKI[k.wert];
+  return null;
+}
+let tttTypen = new Set(["verein", "land", "liga", "pokal", "ligasieger"]); // erlaubte Kriterien-Arten
+let tttStufe = 2;      // Schwierigkeit: 1 = leicht (nur große Namen), 3 = schwer (alle)
+let tttModus = "zufall"; // "zufall" | "custom"
+
+function kritLabel(k) {
+  if (k.typ === "pokal")      return POKAL_LABEL[k.wert];
+  if (k.typ === "ligasieger") return "🏅 " + k.wert + "-Sieger";
+  if (k.typ === "land")       return (FLAGGEN[k.wert] || "🌍") + " " + k.wert;
+  if (k.typ === "liga")       return "🏟️ " + k.wert;
+  return "⚽ " + vereinVollname(k.wert); // Vereine immer ausgeschrieben
+}
+
+// Reiner Text des Kriteriums (ohne Emoji), für Zellen mit Bild
+function kritText(k) {
+  if (k.typ === "pokal")      return POKAL_LABEL[k.wert].replace("🏆 ", "");
+  if (k.typ === "ligasieger") return k.wert + "-Sieger";
+  return k.wert;
+}
+function passtZuKriterium(s, k) {
+  if (k.typ === "pokal")      return !!s[k.wert];
+  if (k.typ === "ligasieger") return s.ligaSieger.includes(k.wert);
+  if (k.typ === "land")       return s.land === k.wert;
+  if (k.typ === "liga")       return s.ligen.includes(k.wert);
+  return s.klubs.includes(k.wert);
+}
+
+// Triviale (zu einfache) Paare ausschließen.
+function trivialesPaar(a, b) {
+  const typ = (t) => a.typ === t ? a : b.typ === t ? b : null;
+  const verein = typ("verein"), liga = typ("liga"), sieger = typ("ligasieger");
+  // Verein × Liga, in der dieser Verein spielt (jeder Vereinsspieler erfüllt beides)
+  if (verein && liga && LIGA_KLUBS[liga.wert].includes(verein.wert)) return true;
+  // Liga-Sieger × dieselbe Liga (gespielt) – Sieger hat dort logischerweise gespielt
+  if (sieger && liga && sieger.wert === liga.wert) return true;
+  // Liga-Sieger × ein Meisterklub dieser Liga (jeder solche Vereinsspieler ist Sieger)
+  if (sieger && verein && (LIGA_MEISTER_KLUBS[sieger.wert] || []).includes(verein.wert)) return true;
+  return false;
+}
+
+document.querySelectorAll("#tttTypen .chip:not([disabled])").forEach(chip =>
+  chip.addEventListener("click", () => {
+    const typ = chip.dataset.typ;
+    if (tttTypen.has(typ)) tttTypen.delete(typ);
+    else tttTypen.add(typ);
+    chip.classList.toggle("aktiv");
+  })
+);
+document.querySelectorAll("#tttStufeGrid .tttStufeChip").forEach(chip =>
+  chip.addEventListener("click", () => {
+    tttStufe = Number(chip.dataset.stufe);
+    document.querySelectorAll("#tttStufeGrid .tttStufeChip").forEach(c =>
+      c.classList.toggle("aktiv", c === chip));
+  })
+);
+document.querySelectorAll("#tttModus .modusChip").forEach(chip =>
+  chip.addEventListener("click", () => {
+    tttModus = chip.dataset.modus;
+    document.querySelectorAll("#tttModus .modusChip").forEach(c =>
+      c.classList.toggle("aktiv", c === chip));
+  })
+);
+
+function tttSetupZeigen() {
+  $("tttSetup").style.display = "flex";
+  $("tttCustom").style.display = "none";
+  $("tttSpiel").style.display = "none";
+  $("tttOver").style.display = "none";
+  $("tttPicker").style.display = "none";
+}
+function kandidaten(zeile, spalte) {
+  return SPIELER.filter(s => passtZuKriterium(s, zeile) && passtZuKriterium(s, spalte));
+}
+
+// Kriterien-Pool je nach Schwierigkeit und aktiven Arten.
+// starMin = Mindestzahl an Star-Spielern (nicht-licht), damit ein Verein/eine
+// Nation als Kriterium auftaucht — steuert, wie bekannt die Kriterien sind.
+function tttKriterienPool(stufe) {
+  // Prominenz gewichtet: Weltstar (stufe 1) = 3, bekannt (2) = 2, Kenner (3) = 1,
+  // Import (licht, stufe 4) = 0. So werden große Klubs/Nationen bevorzugt.
+  const gew = { 1: 3, 2: 2, 3: 1 };
+  const prom = (fn) => {
+    const all = {}, p = {};
+    SPIELER.forEach(s => fn(s).forEach(w => {
+      all[w] = (all[w] || 0) + 1;
+      p[w] = (p[w] || 0) + (gew[s.stufe] || 0);
+    }));
+    return { all, p };
+  };
+  const kl = prom(s => s.klubs), na = prom(s => [s.land]);
+  const TOP5_LIGEN = ["Bundesliga", "Premier League", "La Liga", "Serie A", "Ligue 1"];
+  const top5Klubs = new Set(TOP5_LIGEN.flatMap(l => LIGA_KLUBS[l]));
+
+  // Vereine je Stufe:
+  //  Leicht = NUR Top-Teams der Top-5-Ligen (Prominenz ≥30, ~16 Giganten)
+  //  Mittel = alle bekannteren Klubs (Prominenz ≥8, auch Ajax/Benfica …)
+  //  Schwer = alle Klubs der Datenbank inkl. kleiner Vereine & Importe
+  let vNames;
+  if (stufe === 1)      vNames = Object.keys(kl.all).filter(k => top5Klubs.has(k) && kl.p[k] >= 30);
+  else if (stufe === 2) vNames = Object.keys(kl.all).filter(k => kl.all[k] >= 5 && kl.p[k] >= 8);
+  else                  vNames = Object.keys(kl.all).filter(k => kl.all[k] >= 5);
+  const vereine = vNames.sort().map(w => ({ typ: "verein", wert: w }));
+
+  // Nationen: Leicht nur große Fußballnationen, Schwer alle
+  const minNat = stufe === 1 ? 20 : stufe === 2 ? 8 : 0;
+  const andere = [];
+  if (tttTypen.has("land"))
+    andere.push(...Object.keys(na.all)
+      .filter(l => na.all[l] >= 5 && na.p[l] >= minNat).sort()
+      .map(w => ({ typ: "land", wert: w })));
+  if (tttTypen.has("liga")) {
+    const ligen = stufe === 1 ? TOP5_LIGEN : Object.keys(LIGA_KLUBS); // Leicht: nur Top-5-Ligen
+    andere.push(...ligen.map(w => ({ typ: "liga", wert: w })));
+  }
+  if (tttTypen.has("pokal"))
+    andere.push({ typ: "pokal", wert: "wm" }, { typ: "pokal", wert: "cl" }, { typ: "pokal", wert: "em" });
+  if (tttTypen.has("ligasieger"))
+    andere.push(...Object.keys(LIGA_MEISTER_KLUBS).map(w => ({ typ: "ligasieger", wert: w })));
+  return { vereine, andere, alle: [...vereine, ...andere] };
+}
+
+function neuesTtt() {
+  const mische = arr => [...arr].sort(() => Math.random() - 0.5);
+  // Sanfter Fallback, falls die gewählte Stufe kein Raster hergibt:
+  // Leicht → Mittel → Schwer, Mittel → Schwer.
+  const stufen = tttStufe === 1 ? [1, 2, 3] : tttStufe === 2 ? [2, 3] : [3];
+  for (const st of stufen) {
+    const { vereine, alle } = tttKriterienPool(st);
+    for (const minimum of [2, 1]) {
+      for (let versuch = 0; versuch < 80; versuch++) {
+        const zeilen = mische(vereine).slice(0, 3);
+        if (zeilen.length < 3) break;
+        const passende = mische(alle.filter(k =>
+          !zeilen.includes(k) &&
+          zeilen.every(z => !trivialesPaar(z, k) && kandidaten(z, k).length >= minimum)
+        ));
+        if (passende.length >= 3) {
+          ttt.zeilen = zeilen;
+          ttt.spalten = passende.slice(0, 3);
+          startTttRaster();
+          return;
+        }
+      }
+    }
+  }
+  startTttRaster(); // sollte praktisch nie leer sein
+}
+
+function startTttRaster() {
+  ttt.besitzer = Array(9).fill(null);
+  ttt.benutzte = new Set();
+  ttt.aktiv = "rot";
+  ttt.vorbei = false;
+  $("tttSetup").style.display = "none";
+  $("tttCustom").style.display = "none";
+  $("tttSpiel").style.display = "block";
+  $("tttOver").style.display = "none";
+  $("tttPicker").style.display = "none";
+  $("btnTttAufgeben").disabled = false;
+  baueTttGrid();
+  zeigeTttStatus();
+}
+
+// ----- Modus "Selbst wählen": 6 Dropdowns + Prüfung -----
+function kritKey(k) { return k.typ + "|" + k.wert; }
+function kritVonKey(key) { const t = key.indexOf("|"); return { typ: key.slice(0, t), wert: key.slice(t + 1) }; }
+
+function tttCustomZeigen() {
+  const { alle } = tttKriterienPool(tttStufe);
+  const gruppenName = { verein: "Vereine", land: "Nationen", liga: "Ligen", pokal: "Pokale", ligasieger: "Liga-Sieger" };
+  let html = '<option value="">— wählen —</option>';
+  for (const g of ["verein", "land", "liga", "pokal", "ligasieger"]) {
+    const items = alle.filter(k => k.typ === g);
+    if (!items.length) continue;
+    html += `<optgroup label="${gruppenName[g]}">` +
+      items.map(k => `<option value="${kritKey(k)}">${kritLabel(k)}</option>`).join("") +
+      "</optgroup>";
+  }
+  document.querySelectorAll(".tttSelect").forEach(sel => { sel.innerHTML = html; sel.value = ""; });
+  $("tttCustomWarnung").textContent = "";
+  $("tttSetup").style.display = "none";
+  $("tttSpiel").style.display = "none";
+  $("tttCustom").style.display = "flex";
+}
+
+function tttCustomBauen() {
+  const werte = ["z0", "z1", "z2", "s0", "s1", "s2"].map(id =>
+    document.querySelector(`.tttSelect[data-slot="${id}"]`).value);
+  if (werte.some(v => !v)) {
+    $("tttCustomWarnung").textContent = "Bitte alle sechs Felder wählen.";
+    return;
+  }
+  if (new Set(werte).size < 6) {
+    $("tttCustomWarnung").textContent = "Jedes Kriterium darf nur einmal vorkommen.";
+    return;
+  }
+  const zeilen = werte.slice(0, 3).map(kritVonKey);
+  const spalten = werte.slice(3, 6).map(kritVonKey);
+  const probleme = [];
+  zeilen.forEach(z => spalten.forEach(s => {
+    if (trivialesPaar(z, s))
+      probleme.push(`„${kritLabel(z)} × ${kritLabel(s)}" ist zu einfach (erfüllt jeder automatisch)`);
+    else if (kandidaten(z, s).length === 0)
+      probleme.push(`„${kritLabel(z)} × ${kritLabel(s)}" hat keine Lösung`);
+  }));
+  if (probleme.length) {
+    $("tttCustomWarnung").textContent =
+      probleme[0] + (probleme.length > 1 ? ` (+${probleme.length - 1} weitere)` : "");
+    return;
+  }
+  ttt.zeilen = zeilen;
+  ttt.spalten = spalten;
+  startTttRaster();
+}
+
+// "Neues Raster" / "Nochmal": im gewählten Modus weitermachen
+function tttWiederhole() {
+  if (tttModus === "custom") tttCustomZeigen();
+  else neuesTtt();
+}
+
+// Kriterien-Kopfzelle: Kürzel-Badge im TV-Ticker-Stil (BVB/GER/PL …) in den
+// Vereins-/Flaggen-/Liga-Farben, darunter der KOMPLETTE Name („FC Bayern
+// München"; Daniels Wunsch 2026-07-26). Pokale behalten ihr Trophäen-Foto.
+// Kriterien ohne Farbeintrag: neutrale Kachel mit Emoji + Text.
+function kritZelleEl(k) {
+  const zelle = el("div", "tttKrit", "");
+  // Länder: großes Flaggen-Emoji statt Kürzel-Badge, Name darunter
+  if (k.typ === "land") {
+    zelle.appendChild(el("span", "kritFlagge", FLAGGEN[k.wert] || "🌍"));
+    zelle.appendChild(el("span", "kritText", k.wert));
+    return zelle;
+  }
+  // Liga-Sieger: 🏆-Emoji statt Kürzel-Badge, voller Name darunter
+  if (k.typ === "ligasieger") {
+    zelle.appendChild(el("span", "kritFlagge", "🏆"));
+    zelle.appendChild(el("span", "kritText", kritText(k)));
+    return zelle;
+  }
+  // Ligen: 🏟️-Emoji statt Kürzel-Badge, voller Name darunter
+  if (k.typ === "liga") {
+    zelle.appendChild(el("span", "kritFlagge", "🏟️"));
+    zelle.appendChild(el("span", "kritText", k.wert));
+    return zelle;
+  }
+  const bildTitel = kritBildTitel(k); // im Launch-Modus null für Verein/Liga
+  const badge = !bildTitel ? kritBadgeDaten(k) : null;
+  if (badge) {
+    const b = el("span", "kritBadge", badge.kuerzel);
+    b.style.background = badge.farben[0];
+    b.style.color = badgeTextFarbe(badge.farben[0], badge.farben[1]);
+    zelle.appendChild(b);
+  }
+  // Mit Badge: voller Name darunter (Verein → offizieller Langname);
+  // ohne Badge: Emoji-Label (🏆 Weltmeister, ⚽ Kleinklub …).
+  const nameMitBadge = k.typ === "verein" ? vereinVollname(k.wert) : kritText(k);
+  const text = el("span", "kritText", badge ? nameMitBadge : kritLabel(k));
+  if (bildTitel) {
+    const img = document.createElement("img");
+    img.className = "kritLogo" + (k.typ === "pokal" ? " pokal" : "");
+    img.alt = "";
+    img.style.display = "none";
+    zelle.appendChild(img);
+    wikiThumb(bildTitel).then(url => {
+      if (!url) return;
+      img.onload = () => {
+        img.style.display = "block";
+        text.textContent = kritText(k);
+      };
+      img.src = url;
+    });
+  }
+  zelle.appendChild(text);
+  return zelle;
+}
+
+function baueTttGrid() {
+  const grid = $("tttGrid");
+  grid.innerHTML = "";
+  grid.appendChild(el("div", "tttKrit tttEcke", ""));
+  ttt.spalten.forEach(sp => grid.appendChild(kritZelleEl(sp)));
+  for (let z = 0; z < 3; z++) {
+    grid.appendChild(kritZelleEl(ttt.zeilen[z]));
+    for (let s = 0; s < 3; s++) {
+      const idx = z * 3 + s;
+      const zelle = el("div", "tttZelle", "");
+      zelle.dataset.idx = idx;
+      zelle.addEventListener("click", () => oeffnePicker(idx));
+      grid.appendChild(zelle);
+    }
+  }
+}
+
+function el(tag, klasse, text) {
+  const e = document.createElement(tag);
+  e.className = klasse;
+  e.textContent = text;
+  return e;
+}
+
+function zeigeTttStatus() {
+  const farbe = ttt.aktiv;
+  $("tttTurn").innerHTML =
+    `<span class="${farbe}">${TTT_SPIELER_NAMEN[farbe]}</span> ist am Zug`;
+}
+
+function oeffnePicker(idx) {
+  if (ttt.vorbei || ttt.besitzer[idx] !== null) return;
+  ttt.zelle = idx;
+  const zeile = ttt.zeilen[Math.floor(idx / 3)], spalte = ttt.spalten[idx % 3];
+  $("pickerKrit").innerHTML = `<em>${kritLabel(zeile)}</em> × <em>${kritLabel(spalte)}</em>`;
+  $("pickerInput").value = "";
+  $("pickerListe").innerHTML = "";
+  $("tttPicker").style.display = "flex";
+  $("pickerInput").focus();
+}
+
+function schliessePicker() {
+  $("tttPicker").style.display = "none";
+  ttt.zelle = null;
+}
+
+$("pickerAbbruch").addEventListener("click", schliessePicker);
+$("btnTttErstellen").addEventListener("click", () => {
+  if (tttModus === "custom") tttCustomZeigen();
+  else neuesTtt();
+});
+$("btnTttCustomBauen").addEventListener("click", tttCustomBauen);
+$("btnTttCustomZurueck").addEventListener("click", tttSetupZeigen);
+$("btnTttEinstellungen").addEventListener("click", tttSetupZeigen);
+$("btnTttNeu").addEventListener("click", tttWiederhole);
+$("btnTttNochmal").addEventListener("click", tttWiederhole);
+$("btnTttAufgeben").addEventListener("click", () => {
+  if (ttt.vorbei) return;
+  tttBeenden("🏳️ Aufgegeben – so wären die Felder lösbar gewesen:");
+});
+
+$("pickerInput").addEventListener("input", () => {
+  const suche = normText($("pickerInput").value);
+  const liste = $("pickerListe");
+  liste.innerHTML = "";
+  if (suche.length < 2) return;
+  SPIELER
+    .filter(s => s._such.includes(suche) && !ttt.benutzte.has(s.name))
+    .slice(0, 8)
+    .forEach(s => {
+      const b = el("button", "", s.name + " (" + s.land + ")");
+      b.addEventListener("click", () => pruefeTipp(s, b));
+      liste.appendChild(b);
+    });
+});
+
+function pruefeTipp(spieler, buttonEl) {
+  const idx = ttt.zelle;
+  const zeile = ttt.zeilen[Math.floor(idx / 3)], spalte = ttt.spalten[idx % 3];
+  const richtig = passtZuKriterium(spieler, zeile) && passtZuKriterium(spieler, spalte);
+  ttt.benutzte.add(spieler.name);
+
+  if (richtig) {
+    ttt.besitzer[idx] = ttt.aktiv;
+    const zelle = document.querySelector(`.tttZelle[data-idx="${idx}"]`);
+    zelle.classList.add("belegt", ttt.aktiv);
+    zelle.innerHTML = "";
+    zelle.appendChild(el("div", "zSymbol", ttt.aktiv === "rot" ? "✕" : "◯"));
+    zelle.appendChild(el("div", "zName", spieler.name));
+    schliessePicker();
+    if (!pruefeTttEnde()) {
+      ttt.aktiv = ttt.aktiv === "rot" ? "blau" : "rot";
+      zeigeTttStatus();
+    }
+  } else {
+    // Falsch: kurz aufblitzen, dann Zugwechsel
+    buttonEl.classList.add("falsch");
+    setTimeout(() => {
+      schliessePicker();
+      ttt.aktiv = ttt.aktiv === "rot" ? "blau" : "rot";
+      zeigeTttStatus();
+    }, 600);
+  }
+}
+
+function pruefeTttEnde() {
+  const b = ttt.besitzer;
+  const linien = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+  for (const [a, m, c] of linien) {
+    if (b[a] && b[a] === b[m] && b[a] === b[c]) {
+      tttBeenden(`🏆 ${TTT_SPIELER_NAMEN[b[a]]} gewinnt!`);
+      return true;
+    }
+  }
+  if (b.every(x => x !== null)) {
+    tttBeenden("Unentschieden!");
+    return true;
+  }
+  return false;
+}
+
+// Offene Felder mit je einem korrekten (möglichst bekannten) Spieler auflösen.
+function loeseOffeneFelder() {
+  const vergeben = new Set(ttt.benutzte); // bereits genannte nicht doppelt zeigen
+  for (let idx = 0; idx < 9; idx++) {
+    if (ttt.besitzer[idx] !== null) continue;
+    const zeile = ttt.zeilen[Math.floor(idx / 3)], spalte = ttt.spalten[idx % 3];
+    let cands = kandidaten(zeile, spalte).filter(s => !vergeben.has(s.name));
+    if (!cands.length) cands = kandidaten(zeile, spalte);
+    // bekannteste zuerst (niedrigste Stufe), damit die Lösung erkennbar ist
+    cands.sort((a, b) => (a.stufe || 9) - (b.stufe || 9));
+    const wahl = cands[0];
+    if (!wahl) continue;
+    vergeben.add(wahl.name);
+    const zelle = document.querySelector(`.tttZelle[data-idx="${idx}"]`);
+    zelle.classList.add("belegt", "loesung");
+    zelle.innerHTML = "";
+    zelle.appendChild(el("div", "zSymbol", "LÖSUNG"));
+    zelle.appendChild(el("div", "zName", wahl.name));
+  }
+}
+
+// Spielende (Sieg, Unentschieden oder Aufgabe): offene Felder auflösen,
+// Ergebnis in die Anzeigetafel schreiben, Grid gesperrt lassen.
+function tttBeenden(text) {
+  ttt.vorbei = true;
+  schliessePicker();
+  loeseOffeneFelder();
+  $("tttTurn").textContent = text;
+  $("btnTttAufgeben").disabled = true;
+}
+
+// ================== Fußball-Bombe ==================
+const bombe = {
+  anzahl: 3,
+  aktive: [],        // verbleibende Spieler (Namen)
+  dranIdx: 0,
+  kat: null,
+  benutzte: new Set(),
+  boomId: null,      // Timeout für die Explosion
+  tickId: null,      // Timeout für das Ticken
+  ende: 0,
+  laeuft: false
+};
+
+// Ticken & Explosion über WebAudio (wird beim Start per Klick initialisiert)
+let audioCtx = null;
+function bombeTonInit() {
+  try { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+  catch { audioCtx = null; }
+}
+function spieleTick() {
+  if (!audioCtx) return;
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.frequency.value = 900;
+  g.gain.setValueAtTime(0.06, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+  o.connect(g).connect(audioCtx.destination);
+  o.start(); o.stop(audioCtx.currentTime + 0.05);
+}
+function spieleBoom() {
+  if (!audioCtx) return;
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.type = "sawtooth";
+  o.frequency.setValueAtTime(160, audioCtx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.5);
+  g.gain.setValueAtTime(0.25, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+  o.connect(g).connect(audioCtx.destination);
+  o.start(); o.stop(audioCtx.currentTime + 0.5);
+}
+
+document.querySelectorAll("#bombeAnzahl .chip").forEach(chip =>
+  chip.addEventListener("click", () => {
+    bombe.anzahl = Number(chip.dataset.n);
+    document.querySelectorAll("#bombeAnzahl .chip").forEach(c =>
+      c.classList.toggle("aktiv", c === chip)
+    );
+  })
+);
+
+$("btnBombeStart").addEventListener("click", () => {
+  bombeTonInit();
+  bombe.aktive = Array.from({ length: bombe.anzahl }, (_, i) => "Spieler " + (i + 1));
+  bombe.dranIdx = 0;
+  $("bombeSetup").style.display = "none";
+  $("bombeSpiel").style.display = "block";
+  neueBombeRunde();
+});
+
+function bombeKategorie() {
+  const zaehle = (fn) => {
+    const m = {};
+    SPIELER.forEach(s => fn(s).forEach(w => m[w] = (m[w] || 0) + 1));
+    return m;
+  };
+  const klubs = zaehle(s => s.klubs);
+  const laender = zaehle(s => [s.land]);
+  const pool = [
+    ...Object.keys(klubs).filter(k => klubs[k] >= 8).map(w => ({ typ: "verein", wert: w })),
+    ...Object.keys(laender).filter(l => laender[l] >= 8).map(w => ({ typ: "land", wert: w })),
+    ...Object.keys(LIGA_KLUBS).map(w => ({ typ: "liga", wert: w })),
+    { typ: "pokal", wert: "wm" }, { typ: "pokal", wert: "cl" }, { typ: "pokal", wert: "em" }
+  ];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function bombeKatText(k) {
+  if (k.typ === "pokal") return { wm: "Weltmeister", cl: "Champions-League-Sieger", em: "Europameister" }[k.wert];
+  if (k.typ === "land")  return "Nationalspieler: " + k.wert;
+  if (k.typ === "liga")  return "Hat in der " + k.wert + " gespielt";
+  return "Hat bei " + k.wert + " gespielt";
+}
+
+function neueBombeRunde() {
+  bombe.kat = bombeKategorie();
+  bombe.benutzte = new Set();
+  $("bombeBenutzt").innerHTML = "";
+  $("bombeInput").value = "";
+  $("bombeListe").innerHTML = "";
+  $("bombeOver").style.display = "none";
+
+  // Kategorie-Karte mit Bild/Flagge aufbauen
+  const katEl = $("bombeKat");
+  katEl.innerHTML = "";
+  const bildTitel = kritBildTitel(bombe.kat);
+  if (bildTitel) {
+    const img = document.createElement("img");
+    img.className = "kritLogo";
+    img.alt = "";
+    img.style.display = "none";
+    katEl.appendChild(img);
+    wikiThumb(bildTitel).then(url => {
+      if (!url) return;
+      img.onload = () => { img.style.display = "block"; };
+      img.src = url;
+    });
+  }
+  const text = el("div", "katText",
+    (bombe.kat.typ === "land" ? (FLAGGEN[bombe.kat.wert] || "🌍") + " " : "") + bombeKatText(bombe.kat));
+  katEl.appendChild(text);
+  katEl.appendChild(el("div", "katHilfe", "Tippt reihum passende Spieler ein – die Zündschnur ist versteckt!"));
+
+  // Zündschnur: 25–55 Sekunden, versteckt
+  const dauer = 25000 + Math.random() * 30000;
+  bombe.ende = performance.now() + dauer;
+  bombe.laeuft = true;
+  bombe.boomId = setTimeout(explosion, dauer);
+  tickSchleife();
+  zeigeBombeDran();
+  $("bombeInput").focus();
+}
+
+function tickSchleife() {
+  if (!bombe.laeuft) return;
+  const rest = bombe.ende - performance.now();
+  spieleTick();
+  const intervall = rest < 5000 ? 180 : rest < 12000 ? 350 : 700;
+  $("bombeEmoji").style.animationDuration = (intervall * 2 / 1000) + "s";
+  bombe.tickId = setTimeout(tickSchleife, intervall);
+}
+
+function zeigeBombeDran() {
+  $("bombeDran").textContent = bombe.aktive[bombe.dranIdx] + " ist dran!";
+}
+
+function bombeStop() {
+  bombe.laeuft = false;
+  clearTimeout(bombe.boomId);
+  clearTimeout(bombe.tickId);
+}
+
+$("bombeInput").addEventListener("input", () => {
+  const suche = normText($("bombeInput").value);
+  const liste = $("bombeListe");
+  liste.innerHTML = "";
+  if (suche.length < 2 || !bombe.laeuft) return;
+  SPIELER
+    .filter(s => s._such.includes(suche) && !bombe.benutzte.has(s.name))
+    .slice(0, 6)
+    .forEach(s => {
+      const b = el("button", "", s.name + " (" + s.land + ")");
+      b.addEventListener("click", () => bombeAntwort(s));
+      liste.appendChild(b);
+    });
+});
+$("bombeInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    const erster = $("bombeListe").querySelector("button");
+    if (erster) erster.click();
+  }
+});
+
+function bombeAntwort(spieler) {
+  if (!bombe.laeuft) return;
+  if (passtZuKriterium(spieler, bombe.kat) && !bombe.benutzte.has(spieler.name)) {
+    bombe.benutzte.add(spieler.name);
+    $("bombeBenutzt").appendChild(el("span", "", spieler.name));
+    $("bombeInput").value = "";
+    $("bombeListe").innerHTML = "";
+    bombe.dranIdx = (bombe.dranIdx + 1) % bombe.aktive.length;
+    zeigeBombeDran();
+    $("bombeInput").focus();
+  } else {
+    const input = $("bombeInput");
+    input.classList.remove("falsch");
+    void input.offsetWidth;
+    input.classList.add("falsch");
+  }
+}
+
+function explosion() {
+  bombeStop();
+  spieleBoom();
+  const raus = bombe.aktive[bombe.dranIdx];
+  bombe.aktive.splice(bombe.dranIdx, 1);
+  bombe.dranIdx = bombe.dranIdx % bombe.aktive.length;
+  if (bombe.aktive.length === 1) {
+    $("bombeOverText").textContent = `💥 BOOM! ${raus} fliegt raus – 🏆 ${bombe.aktive[0]} gewinnt!`;
+    $("btnBombeWeiter").textContent = "Nochmal spielen";
+  } else {
+    $("bombeOverText").textContent = `💥 BOOM! ${raus} ist ausgeschieden – ${bombe.aktive.length} sind noch dabei.`;
+    $("btnBombeWeiter").textContent = "Nächste Runde";
+  }
+  $("bombeOver").style.display = "flex";
+}
+
+$("btnBombeWeiter").addEventListener("click", () => {
+  if (bombe.aktive.length === 1) {
+    $("bombeOver").style.display = "none";
+    $("bombeSetup").style.display = "flex";
+    $("bombeSpiel").style.display = "none";
+  } else {
+    neueBombeRunde();
+  }
+});
+
+function animateValue(el, ziel, format, done) {
+  const dauer = 600, start = performance.now();
+  const dez = Number.isInteger(ziel) ? 0 : 1;
+  function tick(now) {
+    const t = Math.min((now - start) / dauer, 1);
+    const wert = ziel * (1 - Math.pow(1 - t, 3));
+    el.textContent = format(Number(wert.toFixed(dez)));
+    if (t < 1) requestAnimationFrame(tick);
+    else done();
+  }
+  requestAnimationFrame(tick);
+}
+
+// ================== Karriere-Raten ==================
+const kar = { pool: [], stufe: 2, spieler: null, hinweise: [], gezeigt: 1, punkte: 0, best: 0, vorbei: false };
+kar.best = Number(localStorage.getItem("bk_karriere_best") || 0);
+
+function karSetupZeigen() {
+  $("karriereSetup").style.display = "flex";
+  $("karriereSpiel").style.display = "none";
+  $("karOver").style.display = "none";
+}
+document.querySelectorAll("#karriereStufeGrid .karStufeChip").forEach(chip =>
+  chip.addEventListener("click", () => {
+    kar.stufe = Number(chip.dataset.stufe);
+    document.querySelectorAll("#karriereStufeGrid .karStufeChip").forEach(c => c.classList.toggle("aktiv", c === chip));
+  })
+);
+
+function karRundenPunkte() { return Math.max(1, 8 - (kar.gezeigt - 1)); }
+
+function karStartGame() {
+  kar.punkte = 0;
+  $("karPunkte").textContent = 0;
+  $("karBest").textContent = kar.best;
+  $("karriereSetup").style.display = "none";
+  $("karriereSpiel").style.display = "block";
+  neueKarriereRunde();
+}
+
+function neueKarriereRunde() {
+  kar.pool = SPIELER.filter(s => !s.licht && s.stufe <= kar.stufe && s.klubs.length >= 2);
+  kar.spieler = kar.pool[Math.floor(Math.random() * kar.pool.length)];
+  kar.hinweise = kar.spieler.klubs.map(k => ({ typ: "klub", wert: k }));
+  kar.hinweise.push({ typ: "land", wert: kar.spieler.land });
+  if (kar.spieler.alter) kar.hinweise.push({ typ: "alter", wert: kar.spieler.alter });
+  kar.gezeigt = 1;
+  kar.vorbei = false;
+  $("karInput").value = "";
+  $("karListe").innerHTML = "";
+  $("karOver").style.display = "none";
+  renderKarriere();
+  $("karInput").focus();
+}
+
+function renderKarriere() {
+  $("karRunde").textContent = karRundenPunkte();
+  const tl = $("karTimeline");
+  tl.innerHTML = "";
+  kar.hinweise.forEach((h, i) => {
+    const row = document.createElement("div");
+    if (i < kar.gezeigt) {
+      row.className = "karStation" + (h.typ !== "klub" ? " hinweis" : "")
+        + (i === kar.gezeigt - 1 ? " karNeu" : "");
+      if (h.typ === "klub") {
+        if (ZEIGE_WAPPEN) {
+          const img = document.createElement("img");
+          img.className = "karLogo"; img.alt = ""; img.style.visibility = "hidden";
+          row.appendChild(img);
+          wikiThumb(KLUB_WIKI[h.wert] || h.wert).then(url => {
+            if (url) { img.src = url; img.style.visibility = "visible"; }
+            else img.replaceWith(el("span", "karIcon", "⚽")); // Design-Regel: Emoji-Fallback statt Lücke
+          });
+        } else if (VEREINSFARBEN[h.wert]) {
+          // Launch ohne Wappen: Trikot-Icon in den Vereinsfarben
+          row.appendChild(trikotEl(VEREINSFARBEN[h.wert]));
+        } else {
+          row.appendChild(el("span", "karIcon", "⚽")); // Launch ohne Wappen
+        }
+        row.appendChild(el("span", "karName", vereinVollname(h.wert)));
+      } else if (h.typ === "land") {
+        row.appendChild(el("span", "karIcon", FLAGGEN[h.wert] || "🌍"));
+        row.appendChild(el("span", "karName", "Nation: " + h.wert));
+      } else {
+        row.appendChild(el("span", "karIcon", "🎂"));
+        row.appendChild(el("span", "karName", "Alter: " + h.wert));
+      }
+      // „Nächster Hinweis"-Button rechts in der zuletzt aufgedeckten Zeile
+      if (i === kar.gezeigt - 1 && kar.gezeigt < kar.hinweise.length && !kar.vorbei) {
+        const btn = el("button", "karHinweisBtn", "+");
+        btn.title = "Nächster Hinweis";
+        btn.addEventListener("click", () => { kar.gezeigt++; renderKarriere(); });
+        row.appendChild(btn);
+      }
+    } else {
+      row.className = "karStation verdeckt";
+      row.appendChild(el("span", "karQ", "?"));
+      row.appendChild(el("span", "karName", "Hinweis " + (i + 1)));
+    }
+    tl.appendChild(row);
+  });
+}
+
+$("karInput").addEventListener("input", () => {
+  const suche = normText($("karInput").value);
+  const liste = $("karListe"); liste.innerHTML = "";
+  if (suche.length < 2 || kar.vorbei) return;
+  SPIELER.filter(s => !s.licht && s._such.includes(suche)).slice(0, 6).forEach(s => {
+    const b = el("button", "", s.name + " (" + s.land + ")");
+    b.addEventListener("click", () => karTipp(s));
+    liste.appendChild(b);
+  });
+});
+$("karInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") { const b = $("karListe").querySelector("button"); if (b) b.click(); }
+});
+
+function karTipp(spieler) {
+  if (kar.vorbei) return;
+  if (spieler === kar.spieler) {
+    const gut = karRundenPunkte();
+    kar.punkte += gut;
+    $("karPunkte").textContent = kar.punkte;
+    if (kar.punkte > kar.best) {
+      kar.best = kar.punkte;
+      localStorage.setItem("bk_karriere_best", kar.best);
+      $("karBest").textContent = kar.best;
+    }
+    karRundeEnde(true, gut);
+  } else {
+    const inp = $("karInput");
+    inp.classList.remove("falsch"); void inp.offsetWidth; inp.classList.add("falsch");
+    inp.value = ""; $("karListe").innerHTML = "";
+    if (kar.gezeigt < kar.hinweise.length) { kar.gezeigt++; renderKarriere(); }
+  }
+}
+
+$("btnKarAufloesen").addEventListener("click", () => karRundeEnde(false, 0));
+$("btnKarWeiter").addEventListener("click", neueKarriereRunde);
+$("btnKarEinstellungen").addEventListener("click", karSetupZeigen);
+$("btnKarriereStart").addEventListener("click", karStartGame);
+
+function karRundeEnde(geloest, gut) {
+  kar.vorbei = true;
+  kar.gezeigt = kar.hinweise.length;
+  renderKarriere();
+  const fotoWrap = $("karOverFoto");
+  fotoWrap.innerHTML = "";
+  const img = document.createElement("img");
+  img.alt = "";
+  wikiThumb(kar.spieler.wiki || kar.spieler.name).then(url => { if (url) img.src = url; });
+  fotoWrap.appendChild(img);
+  $("karOverText").textContent = (geloest ? "✅ " : "🏳️ ") + kar.spieler.name;
+  $("karOverPunkte").textContent = geloest
+    ? ("+" + gut + " Punkte · gesamt " + kar.punkte)
+    : ("Aufgelöst · gesamt " + kar.punkte);
+  $("karOver").style.display = "flex";
+}
+
+zeigeScreen("home");
+</script>
+</body>
+</html>
