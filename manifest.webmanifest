@@ -1,0 +1,16 @@
+{
+  "name": "Ball-Knowledge – Fußball-Quiz & Ratespiele",
+  "short_name": "Ball-Knowledge",
+  "description": "Fußball-Ratespiele: Höher oder Niedriger, Fußball Tic-Tac-Toe und Karriere-Raten. Wie gut ist dein Fußballwissen?",
+  "lang": "de",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0b141f",
+  "theme_color": "#0b141f",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
