@@ -610,6 +610,15 @@
     text-align: center;
     animation: platzhalterPuls 1.4s ease-in-out infinite;
   }
+  /* Monogramm-Avatar (ZEIGE_FOTOS=false): Initialen auf Vereinsfarben-
+     Verlauf statt Emoji — Hintergrund/Farbe kommen inline aus zeigeAvatar() */
+  .avatarMono {
+    font-family: var(--font-head);
+    font-weight: 800;
+    letter-spacing: 1px;
+    animation: none;
+  }
+  .card .emoji.avatarMono { font-size: 3.4rem; }
   .card.wrong .emoji { outline-color: var(--red); }
   @keyframes platzhalterPuls {
     0%, 100% { opacity: 0.5; }
@@ -1206,8 +1215,9 @@
   #karListe button:hover { border-color: var(--green); background: var(--green-tint); }
   #karOver { display: none; position: fixed; inset: 0; background: rgba(14,26,43,0.55); z-index: 50; align-items: center; justify-content: center; padding: 16px; }
   #karOverFoto img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; object-position: top; border: 3px solid var(--green); margin-bottom: 10px; }
-  /* Fotos aus (ZEIGE_FOTOS=false): Ball-Emoji im gleichen Kreis statt Spielerfoto */
+  /* Fotos aus (ZEIGE_FOTOS=false): Monogramm-Avatar im gleichen Kreis statt Spielerfoto */
   #karOverFoto .karOverEmoji { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--green); background: var(--bg); display: inline-flex; align-items: center; justify-content: center; font-size: 3rem; margin-bottom: 10px; }
+  #karOverFoto .karOverEmoji.avatarMono { font-size: 2.2rem; }
 
   footer {
     margin-top: auto;
@@ -1227,6 +1237,7 @@
     .card { padding: 18px 10px 16px; min-height: unset; }
     .card .photo { width: 100px; height: 100px; }
     .card .emoji { width: 100px; height: 100px; line-height: 92px; font-size: 2rem; }
+    .card .emoji.avatarMono { font-size: 2.2rem; }
     .card .name { font-size: 1.1rem; }
     .card .value { font-size: 2rem; min-height: 2rem; }
     #vs span { width: 36px; height: 36px; font-size: 0.9rem; }
@@ -2462,13 +2473,39 @@ function fotoUrl(spieler) {
   return wikiThumb(spieler.wiki || spieler.name);
 }
 
+// ---- Monogramm-Avatar (Ersatz für Spielerfotos bei ZEIGE_FOTOS=false) ----
+// Initialen des Spielers auf einem Diagonal-Verlauf in den Farben seines
+// letzten Klubs mit Farbeintrag — wirkt gestaltet statt improvisiert.
+function avatarInitialen(name) {
+  const teile = name.split(/\s+/).filter(Boolean);
+  if (teile.length === 1) return teile[0].slice(0, 2).toUpperCase();
+  return (teile[0][0] + teile[teile.length - 1][0]).toUpperCase();
+}
+function avatarFarben(spieler) {
+  const klubs = spieler.klubs || [];
+  for (let i = klubs.length - 1; i >= 0; i--)
+    if (VEREINSFARBEN[klubs[i]]) return VEREINSFARBEN[klubs[i]];
+  return ["#00a651", "#008542"]; // neutraler Fallback in Seitenfarben
+}
+// Textfarbe muss auf BEIDEN Verlaufshälften lesbar sein → nach mittlerer
+// Helligkeit entscheiden (badgeTextFarbe passt hier nicht: dort ist die
+// Zweitfarbe die Schrift, hier sind beide Farben Hintergrund).
+function avatarTextFarbe(f1, f2) {
+  return (hexHelligkeit(f1) + hexHelligkeit(f2)) / 2 > 0.55 ? "#0e1a2b" : "#ffffff";
+}
+function zeigeAvatar(spieler, avatarEl) {
+  const [f1, f2] = avatarFarben(spieler);
+  avatarEl.textContent = avatarInitialen(spieler.name);
+  avatarEl.style.background = "linear-gradient(135deg, " + f1 + " 50%, " + f2 + " 50%)";
+  avatarEl.style.color = avatarTextFarbe(f1, f2);
+  avatarEl.classList.add("avatarMono");
+}
+
 async function zeigeFoto(spieler, imgEl, emojiEl) {
   imgEl.style.display = "none";
   emojiEl.style.display = "block";
   if (!ZEIGE_FOTOS) {
-    // Fotos aus (Lizenzfrage): Emoji-Platzhalter bleibt stehen — ohne
-    // Lade-Pulsieren, denn es kommt ja kein Foto mehr.
-    emojiEl.style.animation = "none";
+    zeigeAvatar(spieler, emojiEl); // Monogramm statt Foto (Lizenzfrage)
     return;
   }
   const erwartet = spieler.name;
@@ -3838,7 +3875,9 @@ function karRundeEnde(geloest, gut) {
     wikiThumb(kar.spieler.wiki || kar.spieler.name).then(url => { if (url) img.src = url; });
     fotoWrap.appendChild(img);
   } else {
-    fotoWrap.appendChild(el("span", "karOverEmoji", "⚽"));
+    const avatar = el("span", "karOverEmoji", "");
+    zeigeAvatar(kar.spieler, avatar); // Monogramm in Klubfarben statt ⚽
+    fotoWrap.appendChild(avatar);
   }
   $("karOverText").textContent = (geloest ? "✅ " : "🏳️ ") + kar.spieler.name;
   $("karOverPunkte").textContent = geloest
