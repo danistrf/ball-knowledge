@@ -575,6 +575,19 @@
     from { transform: translateX(-40px) scale(0.96); opacity: 0.4; }
     to   { transform: translateX(0) scale(1);        opacity: 1; }
   }
+  /* Konsistenz-Politur: Screens faden sanft ein (zeigeScreen), Overlays
+     und der H/N-Endscreen "poppen" statt hart zu erscheinen. Die Animation
+     startet automatisch neu, wenn display none→sichtbar wechselt. */
+  @keyframes screenEin {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .screenEin { animation: screenEin 0.25s ease-out; }
+  @keyframes overPop {
+    from { opacity: 0; transform: scale(0.96) translateY(6px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .overBox, .pickerBox, #gameOver { animation: overPop 0.22s ease-out; }
 
   .card .photo {
     width: 150px;
@@ -722,17 +735,36 @@
     color: var(--red);
   }
   #gameOver .finalScore { font-size: 1rem; color: var(--muted); }
+  /* Endscreen-Politur: der Streak als große Zahl (gold bei neuem Rekord) */
+  #gameOver .finalZahl {
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 3.2rem;
+    line-height: 1.05;
+    color: var(--ink);
+  }
+  #gameOver .finalZahl::before {
+    content: "Dein Streak";
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+  #gameOver .finalZahl.rekord { color: var(--yellow); }
   .shareBtn {
     background: transparent;
     color: var(--green);
     border: 2px solid var(--green);
     border-radius: 10px;
-    padding: 11px 24px;
+    padding: 11px 20px;
     font-family: var(--font-head);
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    font-size: 1rem;
+    letter-spacing: 0.5px;
+    font-size: 0.95rem;
     cursor: pointer;
     transition: background 0.15s, color 0.15s, transform 0.15s;
   }
@@ -1047,19 +1079,23 @@
   }
   .tttSelect:focus { outline: none; border-color: var(--green); }
   .tttWarnung { color: var(--red-dark); font-size: 0.88rem; font-weight: 600; min-height: 1.2em; margin: 0; }
+  /* Sekundär-Button: gleicher Schrift-Stil wie catBtn (Konsistenz-Politur
+     2026-07-27), nur neutral gefärbt und ohne Füllung */
   .sekBtn {
     background: var(--surface);
     border: 1.5px solid var(--line);
     color: var(--muted);
     border-radius: 10px;
-    padding: 11px 18px;
-    font-family: var(--font-body);
-    font-weight: 600;
-    font-size: 0.88rem;
+    padding: 11px 20px;
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.92rem;
     cursor: pointer;
-    transition: border-color 0.15s, color 0.15s;
+    transition: border-color 0.15s, color 0.15s, transform 0.15s;
   }
-  .sekBtn:hover { border-color: var(--muted); color: var(--ink); }
+  .sekBtn:hover { border-color: var(--muted); color: var(--ink); transform: translateY(-1px); }
 
   #tttPicker, #tttOver {
     display: none;
@@ -1652,6 +1688,7 @@
 
   <div id="gameOver">
     <h2>Vorbei!</h2>
+    <div class="finalZahl" id="finalZahl"></div>
     <p class="finalScore" id="finalScore"></p>
     <button class="catBtn" id="btnRestart">Nochmal spielen</button>
     <button class="shareBtn" id="btnShare">🔗 Ergebnis teilen</button>
@@ -2605,6 +2642,15 @@ function zeigeScreen(name) {
   $("tttScreen").style.display = name === "ttt" ? "block" : "none";
   $("bombeScreen").style.display = name === "bombe" ? "block" : "none";
   $("karriereScreen").style.display = name === "karriere" ? "block" : "none";
+  // Konsistenz-Politur: gezeigten Screen sanft einblenden (Klasse neu
+  // setzen, damit die Animation bei jedem Wechsel neu startet)
+  const zielEl = { home: homeScreen, start: startScreen, spiel: gameScreen,
+    ttt: $("tttScreen"), bombe: $("bombeScreen"), karriere: $("karriereScreen") }[name];
+  if (zielEl) {
+    zielEl.classList.remove("screenEin");
+    void zielEl.offsetWidth;
+    zielEl.classList.add("screenEin");
+  }
   $("btnHome").style.visibility = name === "home" ? "hidden" : "visible";
   if (name !== "bombe") bombeStop();
   if (name === "home") {
@@ -2851,8 +2897,10 @@ function guess(richtung) {
         render();
       } else {
         guessButtons.style.display = "none";
-        $("finalScore").textContent =
-          `Dein Streak: ${streak} – Rekord: ${best}`;
+        const rekord = streak === best && streak > 0; // gleiche Logik wie btnShare
+        $("finalZahl").textContent = streak;
+        $("finalZahl").classList.toggle("rekord", rekord);
+        $("finalScore").textContent = rekord ? "🏆 Neuer Rekord!" : `Rekord: ${best}`;
         gameOver.style.display = "flex";
       }
     }, 1100);
