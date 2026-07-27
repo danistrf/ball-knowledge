@@ -1340,6 +1340,27 @@
   }
   .infoBereich details p { color: var(--muted); line-height: 1.6; margin: 10px 0 2px; }
 
+  /* Startseiten-Politur (2026-07-27): Zahlen-Leiste unter dem Intro und
+     Spiel-Akzentfarben an den Regel-Karten (gleiche Farben wie die
+     Spielkarten oben — bindet Regeln optisch an die Spiele). */
+  .statLeiste { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 4px; }
+  .statBox {
+    flex: 1 1 150px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .statBox .statZahl { font-family: var(--font-head); font-weight: 800; font-size: 1.7rem; line-height: 1.1; color: var(--green); }
+  .statBox .statLabel { font-size: 0.78rem; font-weight: 600; color: var(--muted); }
+  .infoKarte.akzGruen { border-left: 5px solid var(--green); }
+  .infoKarte.akzBlau  { border-left: 5px solid #0d6fce; }
+  .infoKarte.akzLila  { border-left: 5px solid #7c3aed; }
+  :root[data-theme="dark"] .infoKarte.akzBlau { border-left-color: #38bdf8; }
+  :root[data-theme="dark"] .infoKarte.akzLila { border-left-color: #a78bfa; }
+
   /* ---------- Darstellung ohne Wappen (Daniels Wahl 2026-07-26) ----------
      TTT: Kürzel-Badge im TV-Ticker-Stil (Farbkasten + Kürzel).
      Karriere-Raten: Trikot-Icon in den Vereinsfarben. */
@@ -1364,6 +1385,37 @@
   .karTrikot svg { width: 30px; height: 26px; display: block; }
 
   /* ---------- Impressum & Datenschutz ---------- */
+  /* Strukturierter Footer (Startseiten-Politur 2026-07-27) */
+  .footerBrand {
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 1.05rem;
+    letter-spacing: 1.5px;
+    color: var(--ink);
+  }
+  .footerBrand span { color: var(--green); }
+  .footerNav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    justify-content: center;
+    margin: 10px 0 12px;
+  }
+  .footerNav button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.82rem;
+    padding: 4px 2px;
+  }
+  .footerNav button:hover { color: var(--green); text-decoration: underline; }
+  .footerHinweis { margin: 0 auto; max-width: 640px; }
+  .footerCopy { margin-top: 10px; color: var(--muted); }
+
+  /* (alt: .footerLinks — ersetzt durch .footerNav, 2026-07-27) */
   .footerLinks { margin-top: 10px; }
   .footerLinks button {
     background: none;
@@ -1548,16 +1600,23 @@
       Ligen und Karrieren – von den Weltstars bis zu den Geheimtipps der
       Bundesliga. Keine Anmeldung, kein Download: Seite öffnen, Spiel wählen,
       losraten.</p>
-    <p>Hinter den Spielen steckt eine Datenbank mit über <strong>2.500
-      Profis</strong> aus den großen europäischen Ligen – mit
-      Karrierestationen, Nationalmannschaften, Titeln und Statistiken. Jede
-      Runde wird daraus neu zusammengestellt: Du kannst beliebig oft spielen,
-      ohne dass sich die Fragen wiederholen. Drei Schwierigkeitsgrade sorgen
-      dafür, dass Gelegenheitsgucker genauso auf ihre Kosten kommen wie
-      echte Kenner.</p>
+    <p>Hinter den Spielen steckt eine Datenbank mit über <strong>25.000
+      Profis</strong> – alle Vereine der fünf europäischen Top-Ligen seit
+      2000 mit kompletten Kadern, dazu die kuratierten Stars der
+      Fußballgeschichte mit Karrierestationen, Nationalmannschaften, Titeln
+      und Statistiken. Jede Runde wird daraus neu zusammengestellt: Du kannst
+      beliebig oft spielen, ohne dass sich die Fragen wiederholen. Drei
+      Schwierigkeitsgrade sorgen dafür, dass Gelegenheitsgucker genauso auf
+      ihre Kosten kommen wie echte Kenner.</p>
+    <div class="statLeiste">
+      <div class="statBox"><div class="statZahl">25.000+</div><div class="statLabel">Spieler in der Datenbank</div></div>
+      <div class="statBox"><div class="statZahl">5</div><div class="statLabel">Top-Ligen komplett seit 2000</div></div>
+      <div class="statBox"><div class="statZahl">3</div><div class="statLabel">Spiele – solo &amp; zu zweit</div></div>
+      <div class="statBox"><div class="statZahl">0 €</div><div class="statLabel">kostenlos, ohne Anmeldung</div></div>
+    </div>
 
     <h2>So funktionieren die Spiele</h2>
-    <div class="infoKarte">
+    <div class="infoKarte akzGruen">
       <h3>📊 Höher oder Niedriger</h3>
       <p>Du siehst zwei Fußballer und eine Statistik – zum Beispiel Tore,
         Länderspiele, Marktwert oder das EA-FC-Rating. Der Wert des linken
@@ -1568,7 +1627,7 @@
       <p>Tipp: Mit mehreren Kategorien bleibt es spannend – die Kategorie
         wechselt dann in jeder Runde zufällig.</p>
     </div>
-    <div class="infoKarte">
+    <div class="infoKarte akzBlau">
       <h3>❌ Fußball Tic-Tac-Toe</h3>
       <p>Das klassische 3×3-Raster, aber mit Fußballwissen: Jede Zeile und
         Spalte steht für ein Kriterium – Vereine, Nationen, Ligen, Pokale
@@ -1581,7 +1640,7 @@
         Sieg oder Aufgabe zeigt sie für alle offenen Felder eine mögliche
         Lösung an.</p>
     </div>
-    <div class="infoKarte">
+    <div class="infoKarte akzLila">
       <h3>🕵️ Karriere-Raten</h3>
       <p>Errate den Profi an seiner Karriere: Die erste Vereinsstation ist
         aufgedeckt, danach kommen nach und nach weitere Klubs, die
@@ -1618,8 +1677,9 @@
     <details>
       <summary>Warum finde ich einen bestimmten Spieler nicht?</summary>
       <p>Die Datenbank umfasst die kuratierten Stars der Fußballgeschichte
-        sowie die Kader der Bundesliga und vieler europäischer Topklubs der
-        letzten Jahre. Ältere oder sehr unbekannte Spieler fehlen teilweise
+        sowie alle Vereine der fünf Top-Ligen (Bundesliga, Premier League,
+        La Liga, Serie A, Ligue 1) seit 2000 mit kompletten Kadern. Ältere
+        Spieler und kleinere Ligen fehlen teilweise
         noch – die Datenbank wächst mit jedem Update. Die Namenssuche
         funktioniert übrigens auch ohne Sonderzeichen: „gundogan" findet
         Gündoğan.</p>
@@ -1882,10 +1942,15 @@
 </section>
 
 <footer>
-  Alle Statistiken: Stand Juli 2026, Richtwerte (gesamte Karriere, Verein + Nationalteam). Ratings: EA FC 26 (bei Karriereende: letztes bekanntes Rating). Kader: Wikidata. Liga-Sieger: aus den Meistervereinen abgeleitet (Richtwert).
-  <div class="footerLinks">
+  <div class="footerBrand">BALL<span>KNOWLEDGE</span></div>
+  <nav class="footerNav" aria-label="Footer">
+    <button type="button" onclick="goHoeher()">Höher oder Niedriger</button>
+    <button type="button" onclick="goTtt()">Fußball Tic-Tac-Toe</button>
+    <button type="button" onclick="goKarriere()">Karriere-Raten</button>
     <button id="btnRecht" type="button">Impressum &amp; Datenschutz</button>
-  </div>
+  </nav>
+  <p class="footerHinweis">Alle Statistiken: Stand Juli 2026, Richtwerte (gesamte Karriere, Verein + Nationalteam). Ratings: EA FC 26 (bei Karriereende: letztes bekanntes Rating). Kader: Wikidata. Liga-Sieger: aus den Meistervereinen abgeleitet (Richtwert).</p>
+  <p class="footerCopy">© 2026 Ball-Knowledge · ball-knowledge.de</p>
 </footer>
 
 <!-- Impressum & Datenschutz (Overlay) -->
