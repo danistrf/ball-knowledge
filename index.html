@@ -1182,6 +1182,8 @@
   #karListe button:hover { border-color: var(--green); background: var(--green-tint); }
   #karOver { display: none; position: fixed; inset: 0; background: rgba(14,26,43,0.55); z-index: 50; align-items: center; justify-content: center; padding: 16px; }
   #karOverFoto img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; object-position: top; border: 3px solid var(--green); margin-bottom: 10px; }
+  /* Fotos aus (ZEIGE_FOTOS=false): Ball-Emoji im gleichen Kreis statt Spielerfoto */
+  #karOverFoto .karOverEmoji { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--green); background: var(--bg); display: inline-flex; align-items: center; justify-content: center; font-size: 3rem; margin-bottom: 10px; }
 
   footer {
     margin-top: auto;
@@ -1522,7 +1524,7 @@
     <h2>Woher stammen die Daten?</h2>
     <p>Die Kader- und Karrieredaten kommen aus <strong>Wikidata</strong> und
       <strong>Wikipedia</strong>, die Spielstärke-Ratings aus
-      <strong>EA FC 26</strong>; Fotos und Vereinslogos werden live von
+      <strong>EA FC 26</strong>; Pokal-Fotos werden live von
       Wikipedia geladen. Alle Statistiken sind Richtwerte über die gesamte
       Karriere (Verein + Nationalteam), Stand Juli 2026. Die Datenbank wird
       laufend erweitert und korrigiert.</p>
@@ -1809,7 +1811,7 @@
 </section>
 
 <footer>
-  Alle Statistiken: Stand Juli 2026, Richtwerte (gesamte Karriere, Verein + Nationalteam). Ratings: EA FC 26 (bei Karriereende: letztes bekanntes Rating). Fotos: Wikipedia. Kader: Wikidata. Liga-Sieger: aus den Meistervereinen abgeleitet (Richtwert).
+  Alle Statistiken: Stand Juli 2026, Richtwerte (gesamte Karriere, Verein + Nationalteam). Ratings: EA FC 26 (bei Karriereende: letztes bekanntes Rating). Pokal-Fotos: Wikipedia. Kader: Wikidata. Liga-Sieger: aus den Meistervereinen abgeleitet (Richtwert).
   <div class="footerLinks">
     <button id="btnRecht" type="button">Impressum &amp; Datenschutz</button>
   </div>
@@ -1844,7 +1846,7 @@
       gespeichert (localStorage) und verlassen dein Gerät nicht. Sie lassen
       sich jederzeit über das Löschen der Browserdaten entfernen.</p>
     <h3>4. Eingebundene Inhalte Dritter</h3>
-    <p>Spieler- und Trophäenfotos werden live von Wikipedia/Wikimedia geladen,
+    <p>Trophäenfotos werden live von Wikipedia/Wikimedia geladen,
       Schriftarten von Google Fonts. Beim Laden dieser Inhalte wird deine
       IP-Adresse technisch bedingt an die jeweiligen Anbieter übertragen.</p>
     <h3>5. Deine Rechte</h3>
@@ -2440,6 +2442,12 @@ function fotoUrl(spieler) {
 async function zeigeFoto(spieler, imgEl, emojiEl) {
   imgEl.style.display = "none";
   emojiEl.style.display = "block";
+  if (!ZEIGE_FOTOS) {
+    // Fotos aus (Lizenzfrage): Emoji-Platzhalter bleibt stehen — ohne
+    // Lade-Pulsieren, denn es kommt ja kein Foto mehr.
+    emojiEl.style.animation = "none";
+    return;
+  }
   const erwartet = spieler.name;
   const url = await fotoUrl(spieler);
   // Falls inzwischen schon der nächste Spieler angezeigt wird: nichts tun
@@ -2477,9 +2485,16 @@ const SEITEN_URL = location.origin + location.pathname;
 // Vereins- und Liga-Logos anzeigen? Wappen/Liga-Logos sind markenrechtlich
 // geschützt — für den öffentlichen Launch bewusst AUS (Daniels Entscheidung,
 // 2026-07-26; siehe /betrieb/rechtliches/offene-fragen.md). Auf true stellen,
-// sobald die Markenfrage geklärt ist. Pokal-FOTOS (Trophäen) und
-// Spielerfotos sind davon nicht betroffen.
+// sobald die Markenfrage geklärt ist. Pokal-FOTOS (Trophäen) sind davon
+// nicht betroffen; Spielerfotos steuert ZEIGE_FOTOS.
 const ZEIGE_WAPPEN = false;
+
+// Spielerfotos (Wikipedia) anzeigen? Für die Monetarisierung bewusst AUS
+// (Daniels Entscheidung, 2026-07-27): Wikipedia-Fotos haben eigene
+// Bildlizenzen (oft mit Namensnennungs-Pflicht) — sobald Werbung läuft,
+// ist das ohne fachkundige Klärung riskant. Auf true stellen, wenn die
+// Lizenzfrage geklärt ist; die App zeigt dann wieder Fotos statt Emojis.
+const ZEIGE_FOTOS = false;
 
 // Kurze Bestätigung unten einblenden (z. B. „Link kopiert").
 let toastTimer = null;
@@ -3791,10 +3806,14 @@ function karRundeEnde(geloest, gut) {
   renderKarriere();
   const fotoWrap = $("karOverFoto");
   fotoWrap.innerHTML = "";
-  const img = document.createElement("img");
-  img.alt = "";
-  wikiThumb(kar.spieler.wiki || kar.spieler.name).then(url => { if (url) img.src = url; });
-  fotoWrap.appendChild(img);
+  if (ZEIGE_FOTOS) {
+    const img = document.createElement("img");
+    img.alt = "";
+    wikiThumb(kar.spieler.wiki || kar.spieler.name).then(url => { if (url) img.src = url; });
+    fotoWrap.appendChild(img);
+  } else {
+    fotoWrap.appendChild(el("span", "karOverEmoji", "⚽"));
+  }
   $("karOverText").textContent = (geloest ? "✅ " : "🏳️ ") + kar.spieler.name;
   $("karOverPunkte").textContent = geloest
     ? ("+" + gut + " Punkte · gesamt " + kar.punkte)
