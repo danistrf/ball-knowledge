@@ -82,6 +82,11 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
+  /* Einschiebe-Animationen (slideIn/karNeu/shake) ragen kurz über den
+     Viewport hinaus → am Handy wackelte die Seite horizontal. clip statt
+     hidden, damit die sticky Topbar weiter funktioniert. */
+  html { overflow-x: clip; }
+
   body {
     font-family: var(--font-body);
     min-height: 100vh;
