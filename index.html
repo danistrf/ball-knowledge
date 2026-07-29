@@ -1255,6 +1255,18 @@
   #karOverFoto .karOverEmoji { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--green); background: var(--bg); display: inline-flex; align-items: center; justify-content: center; font-size: 3rem; margin-bottom: 10px; }
   #karOverFoto .karOverEmoji.avatarMono { font-size: 2.2rem; }
 
+  /* Clip-Studio (nur mit ?clip=1 sichtbar): rendert eine Karriere-Runde
+     als 1080×1920-Video für TikTok — Vorschau klein, Aufnahme in voller
+     Auflösung über canvas.captureStream */
+  #clipOverlay { display: none; position: fixed; inset: 0; background: rgba(14,26,43,0.75); z-index: 60; align-items: center; justify-content: center; padding: 16px; }
+  .clipBox { background: var(--surface); border-radius: 14px; padding: 18px; max-width: 430px; width: 100%; text-align: center; box-shadow: var(--shadow-lift); max-height: 94vh; overflow-y: auto; }
+  .clipBox h2 { font-family: var(--font-head); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; font-size: 1.3rem; margin-bottom: 4px; }
+  #clipSpielerInfo { color: var(--muted); font-size: 0.9rem; margin-bottom: 10px; }
+  #clipCanvas { width: 216px; height: 384px; border-radius: 10px; background: #0b141f; }
+  #clipVideo { width: 216px; border-radius: 10px; display: none; margin-top: 10px; }
+  .clipZeile { display: flex; gap: 10px; justify-content: center; align-items: center; margin-top: 12px; flex-wrap: wrap; color: var(--muted); font-size: 0.9rem; }
+  #btnClipDownload { display: none; text-decoration: none; }
+
   footer {
     margin-top: auto;
     width: 100%;
@@ -1903,6 +1915,8 @@
     </div>
     <div class="startActions">
       <button class="catBtn" id="btnKarriereStart">Spiel starten</button>
+      <!-- Clip-Studio: nur für Daniel sichtbar (Seite mit ?clip=1 öffnen) -->
+      <button class="sekBtn" id="btnClipStudio" style="display:none">🎬 Clip aufnehmen</button>
     </div>
     <p class="tttHinweis">
       Errate den Spieler an seinen Karriere-Stationen. Die erste Station ist
@@ -1995,6 +2009,25 @@
     <p>Da diese Seite selbst keine personenbezogenen Daten speichert, gibt es
       bei uns in der Regel nichts zu beauskunften oder zu löschen. Bei Fragen
       erreichst du uns unter der oben genannten E-Mail-Adresse.</p>
+  </div>
+</div>
+
+<!-- Clip-Studio (TikTok-Aufnahme; Button nur mit ?clip=1 sichtbar) -->
+<div id="clipOverlay" role="dialog" aria-modal="true">
+  <div class="clipBox">
+    <h2>🎬 Clip-Studio</h2>
+    <p id="clipSpielerInfo"></p>
+    <canvas id="clipCanvas" width="1080" height="1920"></canvas>
+    <video id="clipVideo" controls playsinline></video>
+    <div class="clipZeile">
+      <label><input type="checkbox" id="clipAufloesung" checked> Auflösung am Ende zeigen</label>
+    </div>
+    <div class="clipZeile">
+      <button class="sekBtn" id="btnClipZu">Schließen</button>
+      <button class="sekBtn" id="btnClipNeu">🎲 Anderer Spieler</button>
+      <button class="catBtn" id="btnClipStart">Aufnahme starten</button>
+      <a class="catBtn" id="btnClipDownload">💾 Video speichern</a>
+    </div>
   </div>
 </div>
 
@@ -4004,6 +4037,206 @@ function karRundeEnde(geloest, gut) {
     : ("Aufgelöst · gesamt " + kar.punkte);
   $("karOver").style.display = "flex";
 }
+
+// ================== Clip-Studio (TikTok-Aufnahme, ?clip=1) ==================
+// Rendert eine Karriere-Runde als 1080×1920-Video: Stationen decken sich
+// automatisch im TikTok-Rhythmus auf → „Schreib ihn in die Kommentare!" →
+// 3-2-1-Countdown → optional Auflösung. Ausgabe: .webm-Datei (Chrome).
+// Der Auslöse-Button erscheint nur, wenn die Seite mit ?clip=1 geöffnet ist.
+const clip = { spieler: null, stationen: [], zeiten: null, dauer: 0, blobUrl: null, laeuft: false };
+
+function clipSpielerZiehen() {
+  const pool = SPIELER.filter(s => !s.licht && s.stufe <= kar.stufe && s.klubs.length >= 2);
+  clip.spieler = ausMixZiehen(pool, STUFEN_MIX[kar.stufe]);
+  clipTimelineBauen();
+  $("clipSpielerInfo").textContent = clip.spieler.name + " · " + clip.stationen.length +
+    " Stationen · ca. " + Math.round(clip.dauer / 1000) + " s";
+  $("clipVideo").style.display = "none";
+  $("btnClipDownload").style.display = "none";
+  clipZeichnen(clip.dauer); // Standbild: kompletter Aufbau als Vorschau
+}
+
+function clipTimelineBauen() {
+  const s = clip.spieler;
+  // Nur Klub-Stationen (der Hook ist die Karriere); bei >9 kürzen
+  let st = s.klubs.map((k, i) => ({ name: k, leihe: (s.leihen || []).includes(i) }));
+  clip.rest = Math.max(0, st.length - 9);
+  clip.stationen = st.slice(0, 9);
+  const proStation = clip.stationen.length > 7 ? 1150 : 1500;
+  const cta = 1400 + clip.stationen.length * proStation + 500;
+  const countdown = cta + 1700;
+  const countdownEnde = countdown + 3 * 900;
+  clip.zeiten = { stationStart: 1400, proStation, cta, countdown, countdownEnde };
+  clip.dauer = countdownEnde + ($("clipAufloesung").checked ? 3200 : 1600);
+}
+
+function clipRunde(ctx, x, y, b, h, r) { ctx.beginPath(); ctx.roundRect(x, y, b, h, r); }
+
+function clipZeichnen(t) {
+  const ctx = $("clipCanvas").getContext("2d");
+  const W = 1080, H = 1920, z = clip.zeiten;
+  ctx.fillStyle = "#0b141f"; ctx.fillRect(0, 0, W, H);
+
+  // Kopf: Logo-Schriftzug + Serientitel
+  ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+  ctx.font = "800 62px 'Barlow Condensed'";
+  const logoB = ctx.measureText("BALLKNOWLEDGE").width, lx = (W - logoB) / 2;
+  ctx.fillStyle = "#fff"; ctx.fillText("BALL", lx, 120);
+  ctx.fillStyle = "#4ade80"; ctx.fillText("KNOWLEDGE", lx + ctx.measureText("BALL").width, 120);
+  ctx.textAlign = "center";
+  ctx.font = "800 108px 'Barlow Condensed'"; ctx.fillStyle = "#fff";
+  ctx.fillText("KARRIERE-CHECK", W / 2, 260);
+  ctx.fillStyle = "#4ade80"; clipRunde(ctx, W / 2 - 70, 285, 140, 10, 5); ctx.fill();
+  ctx.font = "600 52px Inter"; ctx.fillStyle = "#93a4b5";
+  ctx.fillText("Wer ist dieser Spieler?", W / 2, 380);
+
+  // Stationen (slide-in wie im Spiel)
+  const zeilenH = Math.min(128, Math.floor(920 / (clip.stationen.length + (clip.rest ? 1 : 0))));
+  clip.stationen.forEach((st, i) => {
+    const anfang = z.stationStart + i * z.proStation;
+    if (t < anfang) return;
+    const e = 1 - Math.pow(1 - Math.min(1, (t - anfang) / 320), 3);
+    const y = 470 + i * zeilenH, dx = 60 * (1 - e);
+    ctx.globalAlpha = e;
+    ctx.fillStyle = "#16212e";
+    clipRunde(ctx, 70 + dx, y, 940, zeilenH - 14, 20); ctx.fill();
+    const farben = VEREINSFARBEN[st.name] || ["#00a651", "#008542"];
+    const r = (zeilenH - 14) / 2 - 14, cx = 70 + dx + r + 22, cy = y + (zeilenH - 14) / 2;
+    const grad = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+    grad.addColorStop(0.5, farben[0]); grad.addColorStop(0.5, farben[1]);
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.fillStyle = grad; ctx.fill();
+    ctx.lineWidth = 5; ctx.strokeStyle = "#0b141f"; ctx.stroke();
+    // Name (auf Breite einpassen), dahinter gedimmt "(Leihe)"
+    let fs = Math.min(56, zeilenH - 62);
+    const name = vereinVollname(st.name).toUpperCase();
+    const leihe = st.leihe ? "  (Leihe)" : "";
+    ctx.textAlign = "left";
+    do {
+      ctx.font = "700 " + fs + "px 'Barlow Condensed'";
+      var nb = ctx.measureText(name).width + (st.leihe ? ctx.measureText(leihe).width * 0.7 : 0);
+      fs -= 3;
+    } while (nb > 940 - (cx - 70 - dx) - r - 40 && fs > 26);
+    const tx = cx + r + 26, ty = cy + fs / 3;
+    ctx.fillStyle = "#fff"; ctx.fillText(name, tx, ty);
+    if (st.leihe) {
+      const nw = ctx.measureText(name).width; // Font ist hier noch die Namens-Schrift
+      ctx.font = "600 " + Math.round(fs * 0.55) + "px Inter"; ctx.fillStyle = "#93a4b5";
+      ctx.fillText("(Leihe)", tx + nw + 16, ty);
+    }
+    ctx.globalAlpha = 1;
+  });
+  if (clip.rest && t >= z.stationStart + clip.stationen.length * z.proStation) {
+    ctx.textAlign = "center"; ctx.font = "600 44px Inter"; ctx.fillStyle = "#93a4b5";
+    ctx.fillText("+ " + clip.rest + " weitere Stationen …", W / 2, 470 + clip.stationen.length * zeilenH + 50);
+  }
+
+  // CTA-Panel unten (ab z.cta), Countdown ersetzt den Text
+  if (t >= z.cta) {
+    ctx.fillStyle = "#16212e"; clipRunde(ctx, 70, 1500, 940, 300, 24); ctx.fill();
+    ctx.lineWidth = 6; ctx.strokeStyle = "#4ade80"; ctx.stroke();
+    ctx.textAlign = "center";
+    if (t < z.countdown) {
+      ctx.font = "800 84px 'Barlow Condensed'"; ctx.fillStyle = "#fff";
+      ctx.fillText("SCHREIB IHN IN DIE", W / 2, 1615);
+      ctx.fillText("KOMMENTARE! ⬇️", W / 2, 1710);
+    } else if (t < z.countdownEnde) {
+      const zahl = 3 - Math.floor((t - z.countdown) / 900);
+      ctx.font = "800 200px 'Barlow Condensed'"; ctx.fillStyle = "#ffce55";
+      ctx.fillText(String(zahl), W / 2, 1720);
+    }
+  }
+
+  // Schluss: Auflösung (Overlay über alles) oder „Auflösung folgt"
+  if (t >= z.countdownEnde) {
+    if ($("clipAufloesung").checked) {
+      ctx.fillStyle = "rgba(11,20,31,0.94)"; ctx.fillRect(0, 0, W, H);
+      const [f1, f2] = avatarFarben(clip.spieler);
+      const grad = ctx.createLinearGradient(W / 2 - 170, 620, W / 2 + 170, 960);
+      grad.addColorStop(0.5, f1); grad.addColorStop(0.5, f2);
+      ctx.beginPath(); ctx.arc(W / 2, 790, 170, 0, 7); ctx.fillStyle = grad; ctx.fill();
+      ctx.lineWidth = 10; ctx.strokeStyle = "#4ade80"; ctx.stroke();
+      ctx.textAlign = "center"; ctx.font = "800 120px 'Barlow Condensed'";
+      ctx.fillStyle = avatarTextFarbe(f1, f2); ctx.fillText(avatarInitialen(clip.spieler.name), W / 2, 835);
+      ctx.font = "800 96px 'Barlow Condensed'"; ctx.fillStyle = "#fff";
+      ctx.fillText(clip.spieler.name.toUpperCase(), W / 2, 1090);
+      ctx.font = "700 56px 'Barlow Condensed'"; ctx.fillStyle = "#4ade80";
+      ctx.fillText("SPIEL SELBST → BALL-KNOWLEDGE.DE", W / 2, 1200);
+    } else {
+      ctx.fillStyle = "#16212e"; clipRunde(ctx, 70, 1500, 940, 300, 24); ctx.fill();
+      ctx.lineWidth = 6; ctx.strokeStyle = "#ffce55"; ctx.stroke();
+      ctx.textAlign = "center"; ctx.font = "800 84px 'Barlow Condensed'"; ctx.fillStyle = "#ffce55";
+      ctx.fillText("AUFLÖSUNG FOLGT 👀", W / 2, 1670);
+    }
+  }
+
+  // Wasserzeichen
+  ctx.textAlign = "center"; ctx.font = "600 36px Inter"; ctx.fillStyle = "#5b6b7c";
+  ctx.fillText("ball-knowledge.de", W / 2, H - 40);
+}
+
+async function clipAufnehmen() {
+  if (clip.laeuft) return;
+  if (typeof MediaRecorder === "undefined" || !$("clipCanvas").captureStream) {
+    alert("Aufnahme braucht einen aktuellen Chrome/Edge-Browser."); return;
+  }
+  clip.laeuft = true;
+  $("btnClipStart").disabled = true;
+  $("clipVideo").style.display = "none";
+  $("btnClipDownload").style.display = "none";
+  await Promise.all([
+    document.fonts.load("800 108px 'Barlow Condensed'"),
+    document.fonts.load("700 56px 'Barlow Condensed'"),
+    document.fonts.load("600 52px Inter")
+  ]);
+  clipTimelineBauen();
+  const strom = $("clipCanvas").captureStream(30);
+  const typ = MediaRecorder.isTypeSupported("video/webm;codecs=vp9") ? "video/webm;codecs=vp9" : "video/webm";
+  const rec = new MediaRecorder(strom, { mimeType: typ, videoBitsPerSecond: 8000000 });
+  const teile = [];
+  rec.ondataavailable = e => { if (e.data.size) teile.push(e.data); };
+  const fertig = new Promise(res => rec.onstop = res);
+  rec.start(250);
+  const start = performance.now();
+  // rAF für flüssige 30+ fps; zusätzlich ein Interval-Ticker als Fallback,
+  // damit die Aufnahme auch fertig wird, wenn der Tab in den Hintergrund
+  // gerät (dort pausiert requestAnimationFrame).
+  await new Promise(res => {
+    let fertigFlag = false;
+    const tick = () => {
+      if (fertigFlag) return;
+      const t = performance.now() - start;
+      clipZeichnen(Math.min(t, clip.dauer));
+      if (t >= clip.dauer) { fertigFlag = true; clearInterval(iv); res(); }
+    };
+    const iv = setInterval(tick, 250);
+    (function rafLoop() {
+      if (fertigFlag) return;
+      tick();
+      requestAnimationFrame(rafLoop);
+    })();
+  });
+  rec.stop();
+  await fertig;
+  const blob = new Blob(teile, { type: "video/webm" });
+  if (clip.blobUrl) URL.revokeObjectURL(clip.blobUrl);
+  clip.blobUrl = URL.createObjectURL(blob);
+  $("clipVideo").src = clip.blobUrl;
+  $("clipVideo").style.display = "block";
+  const a = $("btnClipDownload");
+  a.href = clip.blobUrl;
+  a.download = "karriere-check-" + clip.spieler.name.toLowerCase().replace(/\s+/g, "-") + ".webm";
+  a.style.display = "inline-block";
+  $("btnClipStart").disabled = false;
+  clip.laeuft = false;
+  showToast("Clip fertig – unten prüfen, dann speichern");
+}
+
+if (new URLSearchParams(location.search).has("clip")) $("btnClipStudio").style.display = "";
+$("btnClipStudio").addEventListener("click", () => { $("clipOverlay").style.display = "flex"; clipSpielerZiehen(); });
+$("btnClipNeu").addEventListener("click", clipSpielerZiehen);
+$("btnClipZu").addEventListener("click", () => { $("clipOverlay").style.display = "none"; });
+$("clipAufloesung").addEventListener("change", () => { clipTimelineBauen(); clipZeichnen(clip.dauer); });
+$("btnClipStart").addEventListener("click", clipAufnehmen);
 
 zeigeScreen("home");
 
