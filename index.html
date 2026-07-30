@@ -4440,7 +4440,10 @@ async function clipAufnehmen() {
   ]);
   clipTimelineBauen();
   const strom = $("clipCanvas").captureStream(30);
-  const typ = MediaRecorder.isTypeSupported("video/webm;codecs=vp9") ? "video/webm;codecs=vp9" : "video/webm";
+  // MP4 bevorzugen (läuft auf iPhone/TikTok-App direkt), webm als Fallback
+  const typ = ["video/mp4;codecs=avc1", "video/mp4", "video/webm;codecs=vp9", "video/webm"]
+    .find(t => MediaRecorder.isTypeSupported(t)) || "video/webm";
+  clip.dateiTyp = typ.startsWith("video/mp4") ? "mp4" : "webm";
   const rec = new MediaRecorder(strom, { mimeType: typ, videoBitsPerSecond: 8000000 });
   const teile = [];
   rec.ondataavailable = e => { if (e.data.size) teile.push(e.data); };
@@ -4467,7 +4470,7 @@ async function clipAufnehmen() {
   });
   rec.stop();
   await fertig;
-  const blob = new Blob(teile, { type: "video/webm" });
+  const blob = new Blob(teile, { type: "video/" + clip.dateiTyp });
   if (clip.blobUrl) URL.revokeObjectURL(clip.blobUrl);
   clip.blobUrl = URL.createObjectURL(blob);
   $("clipVideo").src = clip.blobUrl;
@@ -4479,7 +4482,7 @@ async function clipAufnehmen() {
     : clip.modus === "ttt"
       ? "nenn-mir-einen-" + clip.tttA.wert + "-" + clip.tttB.wert
       : "hoeher-niedriger-" + clip.hnLinks.name + "-vs-" + clip.hnRechts.name;
-  a.download = basis.toLowerCase().replace(/[^a-z0-9äöüß]+/gi, "-") + ".webm";
+  a.download = basis.toLowerCase().replace(/[^a-z0-9äöüß]+/gi, "-") + "." + clip.dateiTyp;
   a.style.display = "inline-block";
   $("btnClipStart").disabled = false;
   clip.laeuft = false;
